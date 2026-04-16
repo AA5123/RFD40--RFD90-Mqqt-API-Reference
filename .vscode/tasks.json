@@ -1,0 +1,20 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Python HTTP server",
+			"type": "shell",
+			"command": "c:/Users/AA5123/Desktop/gen2x-api-project/.venv/Scripts/python.exe",
+			"args": [
+				"-m",
+				"http.server",
+				"8000",
+				"--directory",
+				"docs"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

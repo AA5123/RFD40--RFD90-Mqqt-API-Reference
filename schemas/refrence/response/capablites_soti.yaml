@@ -1,0 +1,17 @@
+title: deviceCapabilities
+x-stoplight:
+  id: 7gxiz1we1sv22
+type: object
+description: >-
+  Hardware capabilities of the scanner — indicates whether Bluetooth, Wi-Fi, and barcode
+  scanning features are supported on this particular model.
+properties:
+  isBluetoothSupported:
+    type: boolean
+    description: Indicates whether the device supports Bluetooth functionality.
+  isWifiSupported:
+    type: boolean
+    description: Indicates whether the device supports WiFi connectivity.
+  isScannerSupported:
+    type: boolean
+    description: Indicates whether the device supports scanner capabilities.

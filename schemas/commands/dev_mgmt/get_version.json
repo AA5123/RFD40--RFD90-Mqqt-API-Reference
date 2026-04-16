@@ -1,0 +1,27 @@
+{
+  "title": "get_version",
+  "x-tag": "Device Status",
+  "x-stoplight": {
+    "id": "6t1zk44tshzm1"
+  },
+  "description": "This command is used to retrieve the reader information like device serial no, model no, sku, and firmware version information. ",
+  "type": "object",
+  "examples": [],
+  "properties": {
+    "command": {
+      "type": "string",
+      "enum": ["get_version"],
+      "example": "get_version",
+      "description": "Must be `get_version`. Tells the scanner to return its identity and firmware information."
+    },
+    "requestId": {
+      "type": "string",
+      "example": "abc123",
+      "description": "A unique ID you assign to this request. The scanner echoes it back in the response so you can match requests to responses."
+    }
+  },
+  "required": [
+    "command",
+    "requestId"
+  ]
+}
