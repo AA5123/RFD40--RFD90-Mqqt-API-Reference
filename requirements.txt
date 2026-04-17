@@ -6,3 +6,5 @@ openai>=1.30.0
 python-dotenv>=1.0.0
 # YAML support — for schema files with .yaml/.yml extension
 pyyaml>=6.0.1
+# Windows cert store bridge — fixes SSL verify issues behind corporate TLS inspection
+python-certifi-win32>=1.6.1

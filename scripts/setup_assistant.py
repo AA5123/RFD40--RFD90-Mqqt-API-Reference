@@ -15,6 +15,7 @@ Usage:
 import os
 import time
 from pathlib import Path
+import httpx
 try:
    from openai import OpenAI
 except ImportError:
@@ -32,6 +33,41 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 ENV_PATH = PROJECT_ROOT / ".env"
 DOCS_DIR = PROJECT_ROOT / "docs"
 OPENAPI_PATH = DOCS_DIR / "openapi_md.json"
+
+
+def create_openai_client(api_key: str) -> OpenAI:
+   """Create OpenAI client with optional custom CA bundle for TLS interception environments."""
+   ca_bundle = (
+       os.getenv("OPENAI_CA_BUNDLE", "").strip()
+       or os.getenv("REQUESTS_CA_BUNDLE", "").strip()
+       or os.getenv("SSL_CERT_FILE", "").strip()
+   )
+
+   if ca_bundle:
+       ca_path = Path(ca_bundle)
+       if not ca_path.exists():
+           print(f"\n  ERROR: CA bundle file not found: {ca_bundle}")
+           print("  Set OPENAI_CA_BUNDLE to a valid certificate bundle path.")
+           exit(1)
+       print(f"  Using custom CA bundle: {ca_bundle}")
+       return OpenAI(api_key=api_key, http_client=httpx.Client(verify=str(ca_path), timeout=60.0))
+
+   if os.name == "nt":
+       try:
+           import certifi_win32  # type: ignore # noqa: F401
+
+           print("  Windows certificate store integration enabled")
+       except Exception:
+           pass
+
+   return OpenAI(api_key=api_key)
+
+
+def get_vector_stores_api(client: OpenAI):
+   """Return vector stores API namespace for either older or newer OpenAI SDKs."""
+   if hasattr(client, "vector_stores"):
+       return client.vector_stores
+   return client.beta.vector_stores
 
 def check_prerequisites():
    """Check everything is ready before setup."""
@@ -68,7 +104,7 @@ def main():
            print("\n  Keeping existing assistant.")
            print("  Run: python scripts/serve.py")
            return
-   client = OpenAI(api_key=api_key)
+   client = create_openai_client(api_key)
    # ── Step 1: Upload file ──────────────────────────────────────
    print(f"\n[1/4] Uploading openapi_md.json to OpenAI...")
    file_size = OPENAPI_PATH.stat().st_size / 1024
@@ -81,9 +117,10 @@ def main():
    file_id = file_response.id
    print(f"      File ID: {file_id}")
    print(f"      Status: {file_response.status}")
+   vector_stores_api = get_vector_stores_api(client)
    # ── Step 2: Create Vector Store ──────────────────────────────
    print(f"\n[2/4] Creating Vector Store...")
-   vector_store = client.beta.vector_stores.create(
+   vector_store = vector_stores_api.create(
        name="RFD40 RFD90 API Reference",
        file_ids=[file_id]
    )
@@ -94,7 +131,7 @@ def main():
    max_wait = 120
    waited = 0
    while waited < max_wait:
-       vs = client.beta.vector_stores.retrieve(vector_store_id)
+       vs = vector_stores_api.retrieve(vector_store_id)
        if vs.status == "completed":
            print(" done!")
            break

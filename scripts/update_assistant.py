@@ -11,6 +11,7 @@ Usage:
 import os
 import time
 from pathlib import Path
+import httpx
 try:
    from openai import OpenAI
 except ImportError:
@@ -26,6 +27,41 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 ENV_PATH = PROJECT_ROOT / ".env"
 DOCS_DIR = PROJECT_ROOT / "docs"
 OPENAPI_PATH = DOCS_DIR / "openapi_md.json"
+
+
+def create_openai_client(api_key: str) -> OpenAI:
+   """Create OpenAI client with optional custom CA bundle for TLS interception environments."""
+   ca_bundle = (
+       os.getenv("OPENAI_CA_BUNDLE", "").strip()
+       or os.getenv("REQUESTS_CA_BUNDLE", "").strip()
+       or os.getenv("SSL_CERT_FILE", "").strip()
+   )
+
+   if ca_bundle:
+       ca_path = Path(ca_bundle)
+       if not ca_path.exists():
+           print(f"  ERROR: CA bundle file not found: {ca_bundle}")
+           print("  Set OPENAI_CA_BUNDLE to a valid certificate bundle path.")
+           exit(1)
+       print(f"  Using custom CA bundle: {ca_bundle}")
+       return OpenAI(api_key=api_key, http_client=httpx.Client(verify=str(ca_path), timeout=60.0))
+
+   if os.name == "nt":
+       try:
+           import certifi_win32  # type: ignore # noqa: F401
+
+           print("  Windows certificate store integration enabled")
+       except Exception:
+           pass
+
+   return OpenAI(api_key=api_key)
+
+
+def get_vector_stores_api(client: OpenAI):
+   """Return vector stores API namespace for either older or newer OpenAI SDKs."""
+   if hasattr(client, "vector_stores"):
+       return client.vector_stores
+   return client.beta.vector_stores
 
 def main():
    print("=" * 60)
@@ -48,7 +84,10 @@ def main():
        print(f"  ERROR: {OPENAPI_PATH} not found.")
        print("  Run: python scripts/generate_openapi_tags_md.py first")
        exit(1)
-   client = OpenAI(api_key=api_key)
+
+   client = create_openai_client(api_key)
+   vector_stores_api = get_vector_stores_api(client)
+
    # ── Step 1: Upload new file ───────────────────────────────────
    print(f"\n[1/3] Uploading updated openapi_md.json...")
    file_size = OPENAPI_PATH.stat().st_size / 1024
@@ -60,18 +99,18 @@ def main():
        )
    new_file_id = file_response.id
    print(f"      New File ID: {new_file_id}")
+
    # ── Step 2: Update Vector Store ───────────────────────────────
    print(f"\n[2/3] Updating Vector Store...")
-   # Add new file
-   client.beta.vector_stores.files.create(
+   vector_stores_api.files.create(
        vector_store_id=vector_store_id,
        file_id=new_file_id
    )
-   print(f"      New file added to vector store")
-   # Remove old file
+   print("      New file added to vector store")
+
    if old_file_id:
        try:
-           client.beta.vector_stores.files.delete(
+           vector_stores_api.files.delete(
                vector_store_id=vector_store_id,
                file_id=old_file_id
            )
@@ -79,11 +118,11 @@ def main():
            print(f"      Old file removed: {old_file_id}")
        except Exception as e:
            print(f"      Warning: Could not remove old file: {e}")
-   # Wait for indexing
-   print(f"      Re-indexing", end="", flush=True)
+
+   print("      Re-indexing", end="", flush=True)
    time.sleep(5)
    for _ in range(10):
-       vs = client.beta.vector_stores.retrieve(vector_store_id)
+       vs = vector_stores_api.retrieve(vector_store_id)
        if vs.status == "completed":
            print(" done!")
            break
@@ -91,6 +130,7 @@ def main():
        time.sleep(3)
    else:
        print(" continuing...")
+
    # ── Step 3: Save new file ID ──────────────────────────────────
    print(f"\n[3/3] Saving to .env...")
    set_key(str(ENV_PATH), "OPENAI_FILE_ID", new_file_id)
