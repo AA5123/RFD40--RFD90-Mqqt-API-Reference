@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<title>RFD40 / RFD90 API Reference</title>
+<link href="https://fonts.googleapis.com/css?family=Inter:400,600,700,900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/custom-api.css?v=20260417-1" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://unpkg.com/@alenaksu/json-viewer@2.1.2/dist/json-viewer.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<div id="topbar">
+<div id="topbar-title">RFD40 / RFD90 API Reference</div>
+<div id="topbar-search-wrap">
+<span class="topbar-search-icon">🔍</span>
+<input id="topbar-search" type="search" placeholder="Search operations..." autocomplete="off" />
+<button id="topbar-search-clear" style="display:none;">✕</button>
+<div id="topbar-search-dropdown"></div>
+</div>
+</div>
+<nav id="sidebar">
+<div id="sidebar-title">RFD40 / RFD90 API Reference</div>
+<div id="sidebar-search-wrap">
+<input id="sidebar-search" type="search" placeholder="Search endpoints, tags..." aria-label="Search API docs">
+</div>
+<div id="nav-content"></div>
+</nav>
+<main id="main">
+<div id="content"></div>
+</main>
+<div id="font-scale-panel">
+<span id="font-scale-label">Font</span>
+<button id="font-scale-down" title="Decrease font size">&minus;</button>
+<span id="font-scale-value">100%</span>
+<button id="font-scale-up" title="Increase font size">+</button>
+<button id="font-scale-reset" title="Reset to default">Reset</button>
+</div>
+<!-- ── Chatbot ── -->
+<div id="chat-bubble" title="Ask API Assistant">💬</div>
+<div id="chat-window">
+<div id="chat-header">
+<div id="chat-header-info">
+<span id="chat-avatar">🤖</span>
+<div>
+<div id="chat-title">API Assistant</div>
+<div id="chat-subtitle">RFD40 / RFD90 Expert</div>
+</div>
+</div>
+<div id="chat-header-actions">
+<button id="chat-clear" title="Clear chat">🗑</button>
+<button id="chat-close" title="Close">✕</button>
+</div>
+</div>
+<div id="chat-messages">
+<div class="chat-msg bot">
+<span class="chat-msg-avatar">🤖</span>
+<div class="chat-msg-bubble">
+       Hi! I'm your RFD40 / RFD90 API assistant. Ask me anything about commands, parameters, response fields, or error codes.
+<br><br>
+<strong>Try asking:</strong>
+<ul>
+<li>How do I get device status?</li>
+<li>What fields does get_version return?</li>
+<li>What does error code 3 mean?</li>
+<li>How do I configure the MQTT endpoint?</li>
+<li>What commands are available for inventory?</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="chat-input-bar">
+<textarea id="chat-input" placeholder="Ask about the API..." rows="1"></textarea>
+<button id="chat-send">➤</button>
+</div>
+<div id="chat-footer">
+<span id="chat-status">🟢 RAG Assistant Ready</span>
+<span id="chat-powered">Powered by GPT-4o</span>
+</div>
+</div>
+<script>
+(function() {
+'use strict';
+ /* ── Markdown converter ── */
+ function md(text, options) {
+   if (!text) return '';
+   options = options || {};
+   var codeBlocks = [];
+   var tokenPrefix = '@@CODE_BLOCK_';
+   var normalized = text.replace(/\r\n?/g, '\n').replace(/```([a-zA-Z0-9_-]+)?\n([\s\S]*?)```/g, function (_, lang, code) {
+     var language = (lang || '').toLowerCase();
+     var cls = language ? ' class="language-' + language + '"' : '';
+     var token = tokenPrefix + codeBlocks.length + '@@';
+     codeBlocks.push('<pre' + cls + '><code' + cls + '>' + escHtml(code.trim()) + '</code></pre>');
+     return token;
+   });
+   return normalized.split(/\n{2,}/).map(function (block) {
+     var trimmed = block.trim();
+     if (!trimmed) return '';
+     if (trimmed.indexOf(tokenPrefix) === 0) return codeBlocks[parseInt(trimmed.slice(tokenPrefix.length), 10)] || trimmed;
+     return renderMarkdownBlock(trimmed, options);
+   }).join('');
+ }
+ function escHtml(s) {
+   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+ }
+ function formatInline(text) {
+   if (!text) return '';
+   return text
+     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+     .replace(/`([^`]+)`/g, '<code>$1</code>')
+     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+ }
+ function stripMarkdown(text) {
+   if (!text) return '';
+   return text
+     .replace(/\*\*(.+?)\*\*/g, '$1')
+     .replace(/`([^`]+)`/g, '$1')
+     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+     .replace(/^#{1,6}\s+/gm, '')
+     .replace(/^>\s?/gm, '')
+     .replace(/^[-*]\s+/gm, '• ')
+     .replace(/^\d+\.\s+/gm, '')
+     .trim();
+ }
+ function renderMarkdownBlock(block, options) {
+   var lines = block.split('\n');
+   if (isMarkdownTable(lines)) return renderMarkdownTable(lines);
+   if (lines.every(function (line) { return /^>\s?/.test(line); })) {
+     var quote = lines.map(function (line) { return line.replace(/^>\s?/, ''); }).join('<br>');
+     return '<blockquote><p>' + formatInline(quote) + '</p></blockquote>';
+   }
+   if (lines.every(function (line) { return /^\d+\.\s+/.test(line); })) {
+     return '<ol class="md-ol">' + lines.map(function (line) {
+       return '<li>' + formatInline(line.replace(/^\d+\.\s+/, '')) + '</li>';
+     }).join('') + '</ol>';
+   }
+   if (lines.every(function (line) { return /^-\s+/.test(line); })) {
+     return '<ul>' + lines.map(function (line) {
+       return '<li>' + formatInline(line.replace(/^-\s+/, '')) + '</li>';
+     }).join('') + '</ul>';
+   }
+   var headingMatch = block.match(/^(#{1,6})\s+(.+)$/);
+   if (headingMatch && lines.length === 1) return renderHeading(headingMatch[1].length, headingMatch[2], options);
+   return '<p>' + formatInline(lines.join('<br>')) + '</p>';
+ }
+ function renderHeading(level, text, options) {
+   var headingMap = options.headingMap || {};
+   var targetLevel = headingMap[level] || level;
+   targetLevel = Math.max(1, Math.min(6, targetLevel));
+   var idAttr = '';
+   if (options.idPrefix) idAttr = ' id="' + options.idPrefix + '-' + slugify(text) + '"';
+   return '<h' + targetLevel + ' class="md-h' + level + '"' + idAttr + '>' + formatInline(text) + '</h' + targetLevel + '>';
+ }
+ function isMarkdownTable(lines) {
+   return lines.length >= 2 && /^\|.+\|$/.test(lines[0].trim()) && /^\|(?:\s*:?-{3,}:?\s*\|)+$/.test(lines[1].trim());
+ }
+ function splitMarkdownTableRow(line) {
+   return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(function (cell) { return cell.trim(); });
+ }
+ function renderMarkdownTable(lines) {
+   var headers = splitMarkdownTableRow(lines[0]);
+   var bodyRows = lines.slice(2).filter(function (line) { return !!line.trim(); }).map(splitMarkdownTableRow);
+   var thead = '<thead><tr>' + headers.map(function (cell) { return '<th>' + formatInline(cell) + '</th>'; }).join('') + '</tr></thead>';
+   var tbody = '<tbody>' + bodyRows.map(function (row) {
+     return '<tr>' + headers.map(function (_, index) { return '<td>' + formatInline(row[index] || '') + '</td>'; }).join('') + '</tr>';
+   }).join('') + '</tbody>';
+   return '<div class="table-wrap"><table class="md-table">' + thead + tbody + '</table></div>';
+ }
+ /* ── Schema ── */
+ var schemaNodeUid = 0;
+ var schemaTableUid = 0;
+ function getSchemaType(schema) {
+   if (!schema) return 'object';
+   if (schema.enum) return 'enum';
+   if (schema.type) return schema.type;
+   if (schema.properties) return 'object';
+   if (schema.items) return 'array';
+   if (schema.oneOf) return 'oneOf';
+   if (schema.anyOf) return 'anyOf';
+   if (schema.allOf) return 'allOf';
+   return 'object';
+ }
+ function getSchemaDescription(schema) {
+   if (!schema) return '';
+   var parts = [];
+   if (schema.description) parts.push(schema.description);
+   if (schema.format) parts.push('Format: ' + schema.format);
+   if (schema.pattern) parts.push('Pattern: ' + schema.pattern);
+   if (schema.minLength !== undefined) parts.push('Min length: ' + schema.minLength);
+   if (schema.maxLength !== undefined) parts.push('Max length: ' + schema.maxLength);
+   if (schema.minimum !== undefined) parts.push('Min: ' + schema.minimum);
+   if (schema.maximum !== undefined) parts.push('Max: ' + schema.maximum);
+   if (schema.default !== undefined) parts.push('Default: ' + JSON.stringify(schema.default));
+   if (schema.nullable) parts.push('Nullable');
+   return parts.join(' | ');
+ }
+ function getSchemaDescriptionHtml(schema) {
+   if (!schema) return '';
+   var parts = [];
+   if (schema.description) parts.push(schema.description);
+   if (schema.format) parts.push('Format: <em>' + escHtml(String(schema.format)) + '</em>');
+   if (schema.pattern) parts.push('Pattern: <code>' + escHtml(String(schema.pattern)) + '</code>');
+   if (schema.minLength !== undefined) parts.push('Min length: ' + schema.minLength);
+   if (schema.maxLength !== undefined) parts.push('Max length: ' + schema.maxLength);
+   if (schema.minimum !== undefined) parts.push('Min: ' + schema.minimum);
+   if (schema.maximum !== undefined) parts.push('Max: ' + schema.maximum);
+   if (schema.default !== undefined) parts.push('Default: <code>' + escHtml(JSON.stringify(schema.default)) + '</code>');
+   if (schema.nullable) parts.push('Nullable');
+   return parts.join('<br>');
+ }
+ function getSchemaEnumLine(schema) {
+   if (!schema || !schema.enum) return '';
+   return '<br><span class="schema-allowed">Allowed: ' + schema.enum.map(function (value) { return escHtml(String(value)); }).join(' | ') + '</span>';
+ }
+ function flattenSchema(name, schema, depth, isRequired, result) {
+   if (!schema) return;
+   result = result || [];
+   var type = getSchemaType(schema);
+   var desc = getSchemaDescription(schema);
+   var enumVals = schema.enum ? 'Allowed: ' + schema.enum.join(' | ') : '';
+   var indent = '  '.repeat(depth);
+   var req = isRequired ? '*' : '';
+   result.push([indent + name + req, type, desc + (enumVals ? (desc ? ' | ' : '') + enumVals : '')]);
+   if (schema.properties) {
+     var required = schema.required || [];
+     Object.keys(schema.properties).forEach(function (key) {
+       flattenSchema(key, schema.properties[key], depth + 1, required.indexOf(key) !== -1, result);
+     });
+   }
+   if (schema.items) flattenSchema('items[]', schema.items, depth + 1, false, result);
+   ['allOf', 'anyOf', 'oneOf'].forEach(function (kw) {
+     if (!Array.isArray(schema[kw])) return;
+     schema[kw].forEach(function (child, i) { flattenSchema(kw + ' ' + (i + 1), child, depth + 1, false, result); });
+   });
+   return result;
+ }
+ function buildSchemaNodeRows(name, schema, depth, parentUid, isRequired) {
+   if (!schema) return '';
+   var rows = '';
+   var type = getSchemaType(schema);
+   var description = getSchemaDescriptionHtml(schema);
+   var enumLine = getSchemaEnumLine(schema);
+   var hasChildren = !!(
+     (schema.properties && Object.keys(schema.properties).length) ||
+     schema.items ||
+     (schema.oneOf && schema.oneOf.length) ||
+     (schema.anyOf && schema.anyOf.length) ||
+     (schema.allOf && schema.allOf.length)
+   );
+   var nodeId = hasChildren ? 'schema-node-' + (++schemaNodeUid) : '';
+   var indent = 14 + (depth * 20);
+   var reqBadge = isRequired ? '<span class="schema-req">*</span>' : '';
+   var rowAttrs = parentUid ? ' data-parent="' + parentUid + '" style="display:none;"' : '';
+   var toggleHtml = hasChildren
+     ? '<button type="button" class="schema-toggle-inline" data-target="' + nodeId + '" aria-label="Toggle nested fields">−</button>'
+     : '<span class="schema-toggle-spacer"></span>';
+   rows += '<tr class="schema-row"' + rowAttrs + '>' +
+     '<td style="padding-left:' + indent + 'px;">' + toggleHtml + '<span class="schema-field">' + escHtml(name) + '</span>' + reqBadge + '</td>' +
+     '<td><span class="schema-type">' + escHtml(type) + '</span>' + enumLine + '</td>' +
+     '<td>' + description + '</td>' +
+     '</tr>';
+   if (schema.properties) {
+     var required = schema.required || [];
+     Object.keys(schema.properties).forEach(function (key) {
+       rows += buildSchemaNodeRows(key, schema.properties[key], depth + 1, nodeId, required.indexOf(key) !== -1);
+     });
+   }
+   if (schema.items) rows += buildSchemaNodeRows('items[]', schema.items, depth + 1, nodeId, false);
+   ['allOf', 'anyOf', 'oneOf'].forEach(function (keyword) {
+     if (!Array.isArray(schema[keyword])) return;
+     schema[keyword].forEach(function (childSchema, index) {
+       rows += buildSchemaNodeRows(keyword + ' ' + (index + 1), childSchema, depth + 1, nodeId, false);
+     });
+   });
+   return rows;
+ }
+ function schemaTable(schema) {
+   if (!schema) return '';
+   var tableId = 'schema-table-' + (++schemaTableUid);
+   var rows = '';
+   if (schema.properties && Object.keys(schema.properties).length) {
+     var required = schema.required || [];
+     Object.keys(schema.properties).forEach(function (key) {
+       rows += buildSchemaNodeRows(key, schema.properties[key], 0, null, required.indexOf(key) !== -1);
+     });
+   } else {
+     rows = buildSchemaNodeRows('payload', schema, 0, null, false);
+   }
+   return '<div class="schema-toolbar">' +
+     '<button type="button" class="schema-toolbar-btn" data-schema-table="' + tableId + '" data-schema-action="expand">Expand all</button>' +
+     '<button type="button" class="schema-toolbar-btn" data-schema-table="' + tableId + '" data-schema-action="collapse">Collapse all</button>' +
+     '</div>' +
+     '<table class="schema-table" data-schema-table-id="' + tableId + '"><thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead><tbody>' + rows + '</tbody></table>';
+ }
+ function errorTable(codes) {
+   if (!codes || !codes.length) return '';
+   var rows = codes.map(function (e) {
+     return '<tr><td>' + e.code + '</td><td><code>' + escHtml(e.iot_status_code || '') + '</code></td><td>' + escHtml(e.description || '') + '</td><td>' + escHtml(e.cause || '') + '</td><td>' + escHtml(e.recommended_action || '') + '</td></tr>';
+   }).join('');
+   return '<div class="payload-heading">Error Codes</div>' +
+     '<table class="error-table"><thead><tr><th>Code</th><th>Status</th><th>Description</th><th>Cause</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
+ }
+ function generateExampleFromSchema(schema) {
+   if (!schema) return {};
+   var result = {};
+   if (schema.properties) {
+     Object.keys(schema.properties).forEach(function (key) {
+       var prop = schema.properties[key];
+       if (prop.example !== undefined) { result[key] = prop.example; }
+       else if (prop.enum && prop.enum.length) { result[key] = prop.enum[0]; }
+       else if (prop.const !== undefined) { result[key] = prop.const; }
+       else if (prop.default !== undefined) { result[key] = prop.default; }
+       else {
+         switch (prop.type) {
+           case 'string': result[key] = prop.format === 'date-time' ? '2026-01-01T00:00:00Z' : 'string'; break;
+           case 'integer': result[key] = prop.minimum !== undefined ? prop.minimum : 0; break;
+           case 'number': result[key] = prop.minimum !== undefined ? prop.minimum : 0.0; break;
+           case 'boolean': result[key] = false; break;
+           case 'array': result[key] = []; break;
+           case 'object': result[key] = prop.properties ? generateExampleFromSchema(prop) : {}; break;
+           default: result[key] = null;
+         }
+       }
+     });
+   }
+   return result;
+ }
+ /* ── PDF Generator ── */
+ function generatePDF(op, path) {
+   var jsPDF = window.jspdf.jsPDF;
+   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+   var navy = [0, 61, 107];
+   var white = [255, 255, 255];
+   var lightGray = [245, 246, 248];
+   var borderGray = [213, 217, 224];
+   var textDark = [26, 26, 26];
+   var pageW = 210;
+   var pageH = 297;
+   var margin = 16;
+   var contentW = pageW - margin * 2;
+   var y = 0;
+   var pageNum = 1;
+   function drawHeader() {
+     doc.setFillColor(navy[0], navy[1], navy[2]);
+     doc.rect(0, 0, pageW, 18, 'F');
+     doc.setFont('helvetica', 'bold');
+     doc.setFontSize(9);
+     doc.setTextColor(white[0], white[1], white[2]);
+     doc.text('RFD40 / RFD90 API Reference', margin, 11);
+     doc.setFont('helvetica', 'normal');
+     doc.setFontSize(8);
+     doc.text(op.summary || path, pageW - margin, 11, { align: 'right' });
+     y = 24;
+   }
+   function drawFooter() {
+     doc.setFillColor(navy[0], navy[1], navy[2]);
+     doc.rect(0, pageH - 12, pageW, 12, 'F');
+     doc.setFont('helvetica', 'normal');
+     doc.setFontSize(7);
+     doc.setTextColor(white[0], white[1], white[2]);
+     doc.text('RFD40 / RFD90 API Reference  |  Zebra Technologies', margin, pageH - 5);
+     doc.text('Page ' + pageNum, pageW - margin, pageH - 5, { align: 'right' });
+   }
+   function checkPageBreak(needed) {
+     if (y + needed > pageH - 18) { drawFooter(); doc.addPage(); pageNum++; drawHeader(); }
+   }
+   function sectionHeading(title) {
+     checkPageBreak(12);
+     doc.setFillColor(navy[0], navy[1], navy[2]);
+     doc.rect(margin, y, contentW, 8, 'F');
+     doc.setFont('helvetica', 'bold');
+     doc.setFontSize(9);
+     doc.setTextColor(white[0], white[1], white[2]);
+     doc.text(title, margin + 4, y + 5.5);
+     y += 10;
+   }
+   function subHeading(title) {
+     checkPageBreak(10);
+     doc.setFont('helvetica', 'bold');
+     doc.setFontSize(9);
+     doc.setTextColor(navy[0], navy[1], navy[2]);
+     doc.text(title, margin, y + 5);
+     y += 8;
+   }
+   function bodyText(text) {
+     if (!text) return;
+     var clean = stripMarkdown(text);
+     doc.setFont('helvetica', 'normal');
+     doc.setFontSize(8.5);
+     doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+     var lines = doc.splitTextToSize(clean, contentW);
+     lines.forEach(function (line) { checkPageBreak(6); doc.text(line, margin, y); y += 5.5; });
+     y += 2;
+   }
+   function jsonBlock(jsonObj) {
+     if (!jsonObj) return;
+     var jsonStr = JSON.stringify(jsonObj, null, 2);
+     var lines = jsonStr.split('\n');
+     var blockH = lines.length * 4.5 + 6;
+     checkPageBreak(Math.min(blockH, 40));
+     doc.setFillColor(30, 41, 59);
+     doc.roundedRect(margin, y, contentW, Math.min(blockH, 80), 2, 2, 'F');
+     doc.setFont('courier', 'normal');
+     doc.setFontSize(7);
+     doc.setTextColor(249, 250, 251);
+     var lineY = y + 5;
+     lines.forEach(function (line) { if (lineY > y + 78) return; doc.text(line, margin + 3, lineY); lineY += 4.5; });
+     y += Math.min(blockH, 80) + 4;
+   }
+   function schemaTablePdf(schema, title) {
+     if (!schema) return;
+     subHeading(title + ' Schema');
+     var rows = [];
+     if (schema.properties && Object.keys(schema.properties).length) {
+       var required = schema.required || [];
+       Object.keys(schema.properties).forEach(function (key) { flattenSchema(key, schema.properties[key], 0, required.indexOf(key) !== -1, rows); });
+     } else { flattenSchema('payload', schema, 0, false, rows); }
+     doc.autoTable({
+       startY: y,
+       head: [['Field', 'Type', 'Description']],
+       body: rows,
+       margin: { left: margin, right: margin },
+       styles: { fontSize: 7.5, cellPadding: 2.5, textColor: textDark, lineColor: borderGray, lineWidth: 0.3 },
+       headStyles: { fillColor: navy, textColor: white, fontStyle: 'bold', fontSize: 8 },
+       alternateRowStyles: { fillColor: lightGray },
+       columnStyles: { 0: { cellWidth: 45, font: 'courier', fontStyle: 'bold' }, 1: { cellWidth: 25 }, 2: { cellWidth: 'auto' } },
+       didDrawPage: function (data) { drawFooter(); if (data.pageCount > 1) { pageNum++; drawHeader(); } }
+     });
+     y = doc.lastAutoTable.finalY + 6;
+   }
+   function errorTablePdf(codes) {
+     if (!codes || !codes.length) return;
+     sectionHeading('Error Codes');
+     var rows = codes.map(function (e) { return [String(e.code), e.iot_status_code || '', e.description || '', e.cause || '', e.recommended_action || '']; });
+     doc.autoTable({
+       startY: y,
+       head: [['Code', 'Status', 'Description', 'Cause', 'Action']],
+       body: rows,
+       margin: { left: margin, right: margin },
+       styles: { fontSize: 7, cellPadding: 2, textColor: textDark, lineColor: borderGray, lineWidth: 0.3 },
+       headStyles: { fillColor: navy, textColor: white, fontStyle: 'bold', fontSize: 7.5 },
+       alternateRowStyles: { fillColor: lightGray },
+       columnStyles: { 0: { cellWidth: 14 }, 1: { cellWidth: 28 }, 2: { cellWidth: 38 }, 3: { cellWidth: 38 }, 4: { cellWidth: 'auto' } },
+       didDrawPage: function (data) { drawFooter(); if (data.pageCount > 1) { pageNum++; drawHeader(); } }
+     });
+     y = doc.lastAutoTable.finalY + 6;
+   }
+   drawHeader();
+   doc.setFont('helvetica', 'bold');
+   doc.setFontSize(16);
+   doc.setTextColor(navy[0], navy[1], navy[2]);
+   doc.text(op.summary || path, margin, y);
+   y += 10;
+   doc.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+   doc.setLineWidth(0.5);
+   doc.line(margin, y, pageW - margin, y);
+   y += 6;
+   if (op.description) {
+     sectionHeading('Description');
+     var descBlocks = op.description.replace(/\r\n?/g, '\n').split(/\n{2,}/);
+     descBlocks.forEach(function (block) {
+       var trimmed = block.trim();
+       if (!trimmed) return;
+       var hMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+       if (hMatch) { checkPageBreak(10); doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(navy[0], navy[1], navy[2]); doc.text(hMatch[2], margin, y); y += 7; return; }
+       if (/^>\s?/.test(trimmed)) {
+         checkPageBreak(8);
+         doc.setFillColor(255, 251, 235);
+         var noteText = trimmed.replace(/^>\s?\*?\*?Note:\*?\*?\s?/i, 'Note: ').replace(/^>\s?/gm, '');
+         var noteLines = doc.splitTextToSize(stripMarkdown(noteText), contentW - 8);
+         var noteH = noteLines.length * 5 + 6;
+         doc.roundedRect(margin, y, contentW, noteH, 2, 2, 'F');
+         doc.setDrawColor(245, 158, 11); doc.setLineWidth(1); doc.line(margin, y, margin, y + noteH); doc.setLineWidth(0.2);
+         doc.setFont('helvetica', 'italic'); doc.setFontSize(8); doc.setTextColor(107, 114, 128);
+         noteLines.forEach(function (line, idx) { doc.text(line, margin + 5, y + 4 + idx * 5); });
+         y += noteH + 4; return;
+       }
+       var lines = trimmed.split('\n');
+       if (isMarkdownTable(lines)) {
+         var headers = splitMarkdownTableRow(lines[0]);
+         var bodyRows = lines.slice(2).filter(function (l) { return !!l.trim(); }).map(splitMarkdownTableRow);
+         doc.autoTable({ startY: y, head: [headers], body: bodyRows.map(function (row) { return headers.map(function (_, i) { return stripMarkdown(row[i] || ''); }); }), margin: { left: margin, right: margin }, styles: { fontSize: 7.5, cellPadding: 2.5, textColor: textDark, lineColor: borderGray, lineWidth: 0.3 }, headStyles: { fillColor: navy, textColor: white, fontStyle: 'bold' }, alternateRowStyles: { fillColor: lightGray }, didDrawPage: function () { drawFooter(); pageNum++; drawHeader(); } });
+         y = doc.lastAutoTable.finalY + 6; return;
+       }
+       if (/^[-*]\s+/.test(trimmed) || /^\d+\.\s+/.test(trimmed)) {
+         lines.forEach(function (line) {
+           var text = line.replace(/^[-*]\s+/, '• ').replace(/^\d+\.\s+/, '• ');
+           checkPageBreak(6); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+           var wrapped = doc.splitTextToSize(stripMarkdown(text), contentW - 4);
+           wrapped.forEach(function (wl) { doc.text(wl, margin + 2, y); y += 5.5; });
+         });
+         y += 2; return;
+       }
+       bodyText(trimmed);
+     });
+   }
+   if (op.requestBody && op.requestBody.content) {
+     var ct = op.requestBody.content['application/json'];
+     if (ct) {
+       sectionHeading('MQTT Command Payload');
+       var exObj = ct.examples || {};
+       var exKeys = Object.keys(exObj);
+       var exampleToShow = (exKeys.length && exObj[exKeys[0]].value) ? exObj[exKeys[0]].value : (ct.schema ? generateExampleFromSchema(ct.schema) : null);
+       if (exampleToShow) { subHeading('Example'); jsonBlock(exampleToShow); }
+       if (ct.schema) schemaTablePdf(ct.schema, 'Command');
+     }
+   }
+   if (op.responses) {
+     var resKey = Object.keys(op.responses)[0];
+     var res = op.responses[resKey];
+     if (res && res.content && res.content['application/json']) {
+       var rct = res.content['application/json'];
+       sectionHeading('MQTT Response Payload');
+       var resExObj = rct.examples || {};
+       var resExKeys = Object.keys(resExObj);
+       var resExampleToShow = (resExKeys.length && resExObj[resExKeys[0]].value) ? resExObj[resExKeys[0]].value : (rct.schema ? generateExampleFromSchema(rct.schema) : null);
+       if (resExampleToShow) { subHeading('Example'); jsonBlock(resExampleToShow); }
+       if (rct.schema) schemaTablePdf(rct.schema, 'Response');
+     }
+   }
+   if (op['x-error-codes'] && op['x-error-codes'].length) errorTablePdf(op['x-error-codes']);
+   drawFooter();
+   var filename = (op.summary || path).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/(^_|_$)/g, '') + '.pdf';
+   doc.save(filename);
+ }
+ /* ── Copy / JSON viewer ── */
+ function addCopyButtons() {
+   document.querySelectorAll('pre:not([data-copy])').forEach(function (pre) {
+     pre.setAttribute('data-copy', '1');
+     var btn = document.createElement('button');
+     btn.className = 'copy-btn';
+     btn.textContent = 'Copy';
+     btn.addEventListener('click', function () {
+       var text = pre.textContent.replace('Copy', '').replace('Copied!', '').trim();
+       navigator.clipboard.writeText(text);
+       btn.textContent = 'Copied!';
+       setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+     });
+     pre.appendChild(btn);
+   });
+ }
+ function addCollapseToggles() {
+   document.querySelectorAll('pre:not([data-json-processed])').forEach(function (pre) {
+     var code = pre.querySelector('code.language-json');
+     if (!code) return;
+     pre.setAttribute('data-json-processed', '1');
+     var rawText = code.textContent.trim();
+     try {
+       var json = JSON.parse(rawText);
+       var viewer = document.createElement('json-viewer');
+       var wrapper = document.createElement('div');
+       wrapper.className = 'json-viewer-wrap';
+       var toolbar = document.createElement('div');
+       toolbar.className = 'jv-toolbar';
+       var expandBtn = document.createElement('button');
+       expandBtn.className = 'jv-toolbar-btn';
+       expandBtn.textContent = 'Expand all';
+       expandBtn.addEventListener('click', function () { viewer.expandAll(); });
+       var collapseBtn = document.createElement('button');
+       collapseBtn.className = 'jv-toolbar-btn';
+       collapseBtn.textContent = 'Collapse all';
+       collapseBtn.addEventListener('click', function () { viewer.collapseAll(); });
+       var copyBtn = document.createElement('button');
+       copyBtn.className = 'jv-toolbar-btn jv-copy-btn';
+       copyBtn.textContent = 'Copy';
+       copyBtn.addEventListener('click', function () {
+         navigator.clipboard.writeText(getJsonViewerRaw(wrapper));
+         copyBtn.textContent = 'Copied!';
+         setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1500);
+       });
+       toolbar.appendChild(expandBtn);
+       toolbar.appendChild(collapseBtn);
+       toolbar.appendChild(copyBtn);
+       wrapper.appendChild(toolbar);
+       wrapper.appendChild(viewer);
+       pre.parentNode.replaceChild(wrapper, pre);
+       viewer.data = json;
+       wrapper.setAttribute('data-json-raw', rawText);
+     } catch(e) {}
+   });
+ }
+ function getJsonViewerRaw(container) { return container.getAttribute('data-json-raw') || ''; }
+ function setJsonViewerData(container, value) {
+   if (!container) return;
+   var viewer = container.querySelector('json-viewer');
+   if (!viewer) return;
+   viewer.data = value;
+   container.setAttribute('data-json-raw', JSON.stringify(value, null, 2));
+ }
+ /* ── Schema toggles ── */
+ function wireSchemaToggles() {
+   document.querySelectorAll('.schema-toggle-inline').forEach(function (btn) {
+     if (btn.getAttribute('data-wired')) return;
+     btn.setAttribute('data-wired', '1');
+     var targetId = btn.getAttribute('data-target');
+     var table = btn.closest('.schema-table');
+     var children = table ? table.querySelectorAll('[data-parent="' + targetId + '"]') : [];
+     children.forEach(function (row) { row.style.display = ''; });
+     btn.textContent = '−';
+     btn.addEventListener('click', function () {
+       var isExpanded = btn.textContent === '−';
+       if (isExpanded) { collapseChildren(targetId, table); btn.textContent = '+'; }
+       else { children.forEach(function (row) { row.style.display = ''; }); btn.textContent = '−'; }
+     });
+   });
+ }
+ function collapseChildren(parentId, root) {
+   var scope = root || document;
+   var children = scope.querySelectorAll('[data-parent="' + parentId + '"]');
+   children.forEach(function (row) {
+     row.style.display = 'none';
+     var nestedToggle = row.querySelector('.schema-toggle-inline');
+     if (nestedToggle) { nestedToggle.textContent = '+'; collapseChildren(nestedToggle.getAttribute('data-target'), scope); }
+   });
+ }
+ function wireSchemaToolbars() {
+   document.querySelectorAll('.schema-toolbar-btn').forEach(function (btn) {
+     if (btn.getAttribute('data-wired')) return;
+     btn.setAttribute('data-wired', '1');
+     btn.addEventListener('click', function () {
+       var tableId = btn.getAttribute('data-schema-table');
+       var table = document.querySelector('[data-schema-table-id="' + tableId + '"]');
+       if (!table) return;
+       if (btn.getAttribute('data-schema-action') === 'expand') {
+         table.querySelectorAll('.schema-row').forEach(function (row) { row.style.display = ''; });
+         table.querySelectorAll('.schema-toggle-inline').forEach(function (toggle) { toggle.textContent = '−'; });
+         return;
+       }
+       table.querySelectorAll('.schema-row[data-parent]').forEach(function (row) { row.style.display = 'none'; });
+       table.querySelectorAll('.schema-toggle-inline').forEach(function (toggle) { toggle.textContent = '+'; });
+     });
+   });
+ }
+ /* ── Topbar search ── */
+ function wireTopbarSearch(spec) {
+   var input = document.getElementById('topbar-search');
+   var clearBtn = document.getElementById('topbar-search-clear');
+   var dropdown = document.getElementById('topbar-search-dropdown');
+   if (!input) return;
+   var index = [];
+   var paths = spec.paths || {};
+   Object.keys(paths).forEach(function (path) {
+     Object.keys(paths[path]).forEach(function (method) {
+       var op = paths[path][method];
+       var id = slugify(op.summary || path);
+       var tag = (op.tags || [''])[0];
+       var text = [op.summary || '', op.description || '', tag, JSON.stringify(op.requestBody || ''), JSON.stringify(op.responses || ''), JSON.stringify(op['x-error-codes'] || '')].join(' ').toLowerCase();
+       index.push({ id: id, summary: op.summary || path, tag: tag, text: text, isTag: false });
+     });
+   });
+   (spec.tags || []).forEach(function (t) {
+     index.push({ id: slugify(t.name), summary: t.name, tag: t.name, text: (t.name + ' ' + (t.description || '')).toLowerCase(), isTag: true });
+   });
+   function clearHighlights() { document.querySelectorAll('.search-highlight').forEach(function (el) { el.classList.remove('search-highlight'); }); }
+   function highlightMatches(q) {
+     clearHighlights();
+     if (!q) return;
+     document.querySelectorAll('.operation').forEach(function (opEl) {
+       if ((opEl.textContent || '').toLowerCase().indexOf(q) !== -1) opEl.classList.add('search-highlight');
+     });
+   }
+   function showDropdown(q) {
+     dropdown.innerHTML = '';
+     if (!q) { dropdown.style.display = 'none'; return; }
+     var matches = index.filter(function (item) { return item.text.indexOf(q.toLowerCase()) !== -1; }).slice(0, 10);
+     if (!matches.length) {
+       dropdown.innerHTML = '<div class="topbar-search-empty">No results for "' + escHtml(q) + '"</div>';
+       dropdown.style.display = 'block';
+       return;
+     }
+     matches.forEach(function (item) {
+       var row = document.createElement('div');
+       row.className = 'topbar-search-item';
+       var badge = document.createElement('span');
+       badge.className = item.isTag ? 'topbar-search-badge tag' : 'topbar-search-badge op';
+       badge.textContent = item.isTag ? 'TAG' : 'OP';
+       var label = document.createElement('span');
+       label.className = 'topbar-search-label';
+       label.textContent = item.summary;
+       var tagLabel = document.createElement('span');
+       tagLabel.className = 'topbar-search-tag';
+       tagLabel.textContent = item.isTag ? '' : item.tag;
+       row.appendChild(badge); row.appendChild(label); row.appendChild(tagLabel);
+       row.addEventListener('click', function () {
+         var targetId = item.isTag ? 'tag-' + item.id : 'op-' + item.id;
+         var target = document.getElementById(targetId);
+         if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); target.classList.add('search-highlight'); setTimeout(function () { target.classList.remove('search-highlight'); }, 2000); }
+         dropdown.style.display = 'none';
+         input.value = item.summary;
+         clearBtn.style.display = 'inline-block';
+       });
+       dropdown.appendChild(row);
+     });
+     var footer = document.createElement('div');
+     footer.className = 'topbar-search-footer';
+     footer.textContent = matches.length + ' result' + (matches.length === 1 ? '' : 's');
+     dropdown.appendChild(footer);
+     dropdown.style.display = 'block';
+   }
+   input.addEventListener('input', function () {
+     var q = input.value.trim();
+     clearBtn.style.display = q ? 'inline-block' : 'none';
+     showDropdown(q);
+     highlightMatches(q);
+   });
+   clearBtn.addEventListener('click', function () {
+     input.value = '';
+     clearBtn.style.display = 'none';
+     dropdown.style.display = 'none';
+     clearHighlights();
+   });
+   document.addEventListener('click', function (e) {
+     if (!e.target.closest('#topbar-search-wrap')) dropdown.style.display = 'none';
+   });
+ }
+ /* ══════════════════════════════════════════════════
+    RAG CHATBOT — OpenAI Assistants API
+ ══════════════════════════════════════════════════ */
+ var chatConfig = null;
+ var chatThreadId = null;
+ var chatIsOpen = false;
+ var chatIsTyping = false;
+ /* Load config.json generated by serve.py */
+ async function loadChatConfig() {
+   try {
+     var response = await fetch('config.json?v=' + Date.now());
+     if (!response.ok) throw new Error('not found');
+     var data = await response.json();
+     if (data.apiKey && data.assistantId) {
+       chatConfig = data;
+       updateChatStatus('🟢 RAG Assistant Ready');
+     } else {
+       updateChatStatus('🔴 Not configured — run serve.py');
+     }
+   } catch(e) {
+     updateChatStatus('🔴 Config not found — run serve.py');
+   }
+ }
+ function updateChatStatus(msg) {
+   var el = document.getElementById('chat-status');
+   if (el) el.textContent = msg;
+ }
+ /* Create a new conversation thread */
+ async function createThread() {
+   var response = await fetch('https://api.openai.com/v1/threads', {
+     method: 'POST',
+     headers: {
+       'Content-Type': 'application/json',
+       'Authorization': 'Bearer ' + chatConfig.apiKey,
+       'OpenAI-Beta': 'assistants=v2'
+     },
+     body: JSON.stringify({})
+   });
+   if (!response.ok) throw new Error('Failed to create thread');
+   var data = await response.json();
+   return data.id;
+ }
+ /* Add user message to thread */
+ async function addMessageToThread(threadId, content) {
+   var response = await fetch('https://api.openai.com/v1/threads/' + threadId + '/messages', {
+     method: 'POST',
+     headers: {
+       'Content-Type': 'application/json',
+       'Authorization': 'Bearer ' + chatConfig.apiKey,
+       'OpenAI-Beta': 'assistants=v2'
+     },
+     body: JSON.stringify({ role: 'user', content: content })
+   });
+   if (!response.ok) throw new Error('Failed to add message');
+ }
+ /* Run assistant with streaming */
+ async function runAssistantStream(threadId) {
+   var response = await fetch('https://api.openai.com/v1/threads/' + threadId + '/runs', {
+     method: 'POST',
+     headers: {
+       'Content-Type': 'application/json',
+       'Authorization': 'Bearer ' + chatConfig.apiKey,
+       'OpenAI-Beta': 'assistants=v2'
+     },
+     body: JSON.stringify({
+       assistant_id: chatConfig.assistantId,
+       stream: true
+     })
+   });
+   if (!response.ok) {
+     var err = await response.json();
+     throw new Error(err.error && err.error.message ? err.error.message : 'Run failed: ' + response.status);
+   }
+   return response;
+ }
+ /* Render markdown in chat bubble */
+ function chatRenderMarkdown(text) {
+   if (!text) return '';
+   return text
+     .replace(/```(\w+)?\n([\s\S]*?)```/g, function(_, lang, code) {
+       return '<pre><code>' + escHtml(code.trim()) + '</code></pre>';
+     })
+     .replace(/`([^`]+)`/g, '<code>$1</code>')
+     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+     .replace(/^### (.+)$/gm, '<strong style="display:block;margin-top:8px">$1</strong>')
+     .replace(/^## (.+)$/gm, '<strong style="display:block;margin-top:8px">$1</strong>')
+     .replace(/^# (.+)$/gm, '<strong style="display:block;margin-top:8px">$1</strong>')
+     .replace(/^- (.+)$/gm, '• $1')
+     .replace(/^\d+\. (.+)$/gm, '• $1')
+     .replace(/\n{2,}/g, '<br><br>')
+     .replace(/\n/g, '<br>');
+ }
+ /* Add message bubble to chat */
+ function chatAddMessage(role, text, isHtml) {
+   var messages = document.getElementById('chat-messages');
+   var div = document.createElement('div');
+   div.className = 'chat-msg ' + role;
+   var avatar = document.createElement('span');
+   avatar.className = 'chat-msg-avatar';
+   avatar.textContent = role === 'bot' ? '🤖' : '👤';
+   var bubble = document.createElement('div');
+   bubble.className = 'chat-msg-bubble';
+   if (isHtml) { bubble.innerHTML = text; }
+   else { bubble.textContent = text; }
+   div.appendChild(avatar);
+   div.appendChild(bubble);
+   messages.appendChild(div);
+   messages.scrollTop = messages.scrollHeight;
+   return bubble;
+ }
+ /* Show typing dots */
+ function chatAddTyping() {
+   var messages = document.getElementById('chat-messages');
+   var div = document.createElement('div');
+   div.className = 'chat-msg bot';
+div.id = 'chat-typing';
+   var avatar = document.createElement('span');
+   avatar.className = 'chat-msg-avatar';
+   avatar.textContent = '🤖';
+   var bubble = document.createElement('div');
+   bubble.className = 'chat-msg-bubble chat-typing-bubble';
+   bubble.innerHTML = '<span class="chat-dot"></span><span class="chat-dot"></span><span class="chat-dot"></span>';
+   div.appendChild(avatar);
+   div.appendChild(bubble);
+   messages.appendChild(div);
+   messages.scrollTop = messages.scrollHeight;
+ }
+ function chatRemoveTyping() {
+   var el = document.getElementById('chat-typing');
+   if (el) el.remove();
+ }
+ /* Main send function — RAG via Assistants API */
+ async function chatSend(question) {
+   if (!question.trim() || chatIsTyping) return;
+   if (!chatConfig) {
+     chatAddMessage('bot', '⚠️ Assistant not configured. Please run serve.py first.', false);
+     return;
+   }
+   chatIsTyping = true;
+   updateChatStatus('⏳ Thinking...');
+   document.getElementById('chat-send').disabled = true;
+   /* Show user message */
+   chatAddMessage('user', question, false);
+   chatAddTyping();
+   try {
+     /* Create thread on first message */
+     if (!chatThreadId) {
+       chatThreadId = await createThread();
+     }
+     /* Add message to thread */
+     await addMessageToThread(chatThreadId, question);
+     /* Run assistant with streaming */
+     var response = await runAssistantStream(chatThreadId);
+     chatRemoveTyping();
+     /* Stream the response */
+     var bubble = chatAddMessage('bot', '', true);
+     var fullText = '';
+     var reader = response.body.getReader();
+     var decoder = new TextDecoder();
+     var buffer = '';
+     while (true) {
+       var result = await reader.read();
+       if (result.done) break;
+       buffer += decoder.decode(result.value, { stream: true });
+       var lines = buffer.split('\n');
+       buffer = lines.pop(); /* Keep incomplete line in buffer */
+       lines.forEach(function(line) {
+         line = line.trim();
+         if (!line || line === 'data: [DONE]') return;
+         if (line.startsWith('data: ')) {
+           try {
+             var data = JSON.parse(line.slice(6));
+             /* Handle text delta from assistant */
+             if (data.object === 'thread.message.delta') {
+               var content = data.delta && data.delta.content;
+               if (content && content[0] && content[0].type === 'text') {
+                 var delta = content[0].text && content[0].text.value;
+                 if (delta) {
+                   fullText += delta;
+                   /* Remove OpenAI citation markers like 【4:0†source】 */
+                   var cleanText = fullText.replace(/【[^】]*】/g, '');
+                   bubble.innerHTML = chatRenderMarkdown(cleanText);
+                   var msgs = document.getElementById('chat-messages');
+                   msgs.scrollTop = msgs.scrollHeight;
+                 }
+               }
+             }
+           } catch(e) { /* Skip malformed lines */ }
+         }
+       });
+     }
+     /* Final clean */
+     var finalText = fullText.replace(/【[^】]*】/g, '').trim();
+     bubble.innerHTML = chatRenderMarkdown(finalText);
+     updateChatStatus('🟢 RAG Assistant Ready');
+   } catch(err) {
+     chatRemoveTyping();
+     chatAddMessage('bot', '❌ Error: ' + err.message + '. Please try again.', false);
+     /* Reset thread on error so next message starts fresh */
+     chatThreadId = null;
+     updateChatStatus('🔴 Error — try again');
+     setTimeout(function() { updateChatStatus('🟢 RAG Assistant Ready'); }, 3000);
+   }
+   chatIsTyping = false;
+   document.getElementById('chat-send').disabled = false;
+   document.getElementById('chat-input').focus();
+ }
+ /* Wire chatbot UI */
+ function wireChat() {
+   var bubble = document.getElementById('chat-bubble');
+   var chatWindow = document.getElementById('chat-window');
+   var closeBtn = document.getElementById('chat-close');
+   var clearBtn = document.getElementById('chat-clear');
+   var sendBtn = document.getElementById('chat-send');
+   var input = document.getElementById('chat-input');
+   /* Toggle open/close */
+   bubble.addEventListener('click', function () {
+     chatIsOpen = !chatIsOpen;
+     chatWindow.style.display = chatIsOpen ? 'flex' : 'none';
+     bubble.classList.toggle('active', chatIsOpen);
+     if (chatIsOpen) input.focus();
+   });
+   closeBtn.addEventListener('click', function () {
+     chatIsOpen = false;
+     chatWindow.style.display = 'none';
+     bubble.classList.remove('active');
+   });
+   /* Clear chat history */
+   clearBtn.addEventListener('click', function () {
+     chatThreadId = null; /* Reset thread so next message starts fresh */
+     var messages = document.getElementById('chat-messages');
+     messages.innerHTML = '';
+     chatAddMessage('bot', '✅ Chat cleared! Ask me anything about the RFD40 / RFD90 API.', false);
+   });
+   /* Send on button click */
+   sendBtn.addEventListener('click', function () {
+     var q = input.value.trim();
+     if (q) { input.value = ''; input.style.height = 'auto'; chatSend(q); }
+   });
+   /* Send on Enter (Shift+Enter for new line) */
+   input.addEventListener('keydown', function (e) {
+     if (e.key === 'Enter' && !e.shiftKey) {
+       e.preventDefault();
+       var q = input.value.trim();
+       if (q) { input.value = ''; input.style.height = 'auto'; chatSend(q); }
+     }
+   });
+   /* Auto resize textarea */
+   input.addEventListener('input', function () {
+     input.style.height = 'auto';
+     input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+   });
+ }
+ /* ── Render operation ── */
+ function renderOperation(path, method, op) {
+   var summary = op.summary || path;
+   var id = slugify(summary);
+   var desc = op.description || '';
+   var reqExampleJson = '';
+   var reqHtml = '';
+   if (op.requestBody && op.requestBody.content) {
+     var ct = op.requestBody.content['application/json'];
+     if (ct) {
+       var exObj = ct.examples || {};
+       var reqExKeys = Object.keys(exObj);
+       if (reqExKeys.length && exObj[reqExKeys[0]].value) {
+         reqExampleJson = JSON.stringify(exObj[reqExKeys[0]].value, null, 2);
+       } else if (ct.schema) {
+         var autoExample = generateExampleFromSchema(ct.schema);
+         if (autoExample && Object.keys(autoExample).length) reqExampleJson = JSON.stringify(autoExample, null, 2);
+       }
+       var schemaHtml = ct.schema ? schemaTable(ct.schema) : '';
+       reqHtml = '<div class="payload-section">';
+       reqHtml += '<div class="payload-heading">MQTT Command Payload</div>';
+       reqHtml += '<div class="tab-bar">';
+       if (reqExampleJson) reqHtml += '<button class="tab-btn active" data-tab="req-ex-' + id + '">Example</button>';
+       if (schemaHtml) reqHtml += '<button class="tab-btn' + (reqExampleJson ? '' : ' active') + '" data-tab="req-sc-' + id + '">Schema</button>';
+       reqHtml += '</div>';
+       if (reqExampleJson) {
+         reqHtml += '<div class="tab-panel active" id="req-ex-' + id + '">';
+         if (reqExKeys.length > 1) {
+           var reqExVals = {};
+           reqExKeys.forEach(function (key) { reqExVals[key] = exObj[key].value; });
+           reqHtml += '<select class="example-select" data-panel="req-ex-' + id + '" data-examples="' + encodeURIComponent(JSON.stringify(reqExVals)) + '">';
+           reqExKeys.forEach(function (key) { reqHtml += '<option value="' + escHtml(key) + '">' + escHtml(key) + '</option>'; });
+           reqHtml += '</select>';
+         }
+         reqHtml += '<pre class="language-json"><code class="language-json">' + escHtml(reqExampleJson) + '</code></pre></div>';
+       }
+       if (schemaHtml) reqHtml += '<div class="tab-panel' + (reqExampleJson ? '' : ' active') + '" id="req-sc-' + id + '">' + schemaHtml + '</div>';
+       reqHtml += '</div>';
+     }
+   }
+   var resHtml = '';
+   if (op.responses) {
+     var resKey = Object.keys(op.responses)[0];
+     var res = op.responses[resKey];
+     if (res && res.content && res.content['application/json']) {
+       var rct = res.content['application/json'];
+       var resExObj = rct.examples || {};
+       var resExKeys = Object.keys(resExObj);
+       var resSchemaHtml = rct.schema ? schemaTable(rct.schema) : '';
+       var resExampleJson = '';
+       if (resExKeys.length && resExObj[resExKeys[0]].value) {
+         resExampleJson = JSON.stringify(resExObj[resExKeys[0]].value, null, 2);
+       } else if (rct.schema) {
+         var autoResExample = generateExampleFromSchema(rct.schema);
+         if (autoResExample && Object.keys(autoResExample).length) resExampleJson = JSON.stringify(autoResExample, null, 2);
+       }
+       resHtml = '<div class="payload-section">';
+       resHtml += '<div class="payload-heading">MQTT Response Payload</div>';
+       if (resExampleJson || resSchemaHtml) {
+         resHtml += '<div class="tab-bar">';
+         if (resExampleJson) resHtml += '<button class="tab-btn active" data-tab="res-ex-' + id + '">Example</button>';
+         if (resSchemaHtml) resHtml += '<button class="tab-btn' + (resExampleJson ? '' : ' active') + '" data-tab="res-sc-' + id + '">Schema</button>';
+         resHtml += '</div>';
+         if (resExampleJson) {
+           resHtml += '<div class="tab-panel active" id="res-ex-' + id + '">';
+           if (resExKeys.length > 1) {
+             var resExVals = {};
+             resExKeys.forEach(function(k){ resExVals[k] = resExObj[k].value; });
+             resHtml += '<select class="example-select" data-panel="res-ex-' + id + '" data-examples="' + encodeURIComponent(JSON.stringify(resExVals)) + '">';
+             resExKeys.forEach(function(k) { resHtml += '<option value="' + escHtml(k) + '">' + escHtml(k) + '</option>'; });
+             resHtml += '</select>';
+           }
+           resHtml += '<pre class="language-json"><code class="language-json">' + escHtml(resExampleJson) + '</code></pre>';
+           resHtml += '</div>';
+         }
+         if (resSchemaHtml) resHtml += '<div class="tab-panel' + (resExampleJson ? '' : ' active') + '" id="res-sc-' + id + '">' + resSchemaHtml + '</div>';
+       }
+       resHtml += '</div>';
+     }
+   }
+   return '<div class="operation" id="op-' + id + '" data-op="' + encodeURIComponent(JSON.stringify(op)) + '" data-path="' + escHtml(path) + '">' +
+     '<h3 class="op-title">' + escHtml(summary) + '</h3>' +
+     '<button class="pdf-btn" data-op-id="' + id + '">⬇ Download PDF</button>' +
+     '<div class="op-description md-content">' + md(desc, { headingMap: { 1: 3, 2: 3, 3: 4, 4: 5, 5: 5, 6: 5 } }) + '</div>' +
+     reqHtml + resHtml +
+     (op['x-error-codes'] ? errorTable(op['x-error-codes']) : '') +
+     '</div><hr class="op-divider">';
+ }
+ function slugify(text) {
+   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+ }
+ /* ── Main render ── */
+ function render(spec) {
+   var content = document.getElementById('content');
+   var nav = document.getElementById('nav-content');
+   var searchInput = document.getElementById('sidebar-search');
+   var html = '';
+   var navHtml = '';
+   if (spec.info && spec.info.description) {
+     html += '<div class="info-description md-content">' + md(spec.info.description, { idPrefix: 'info' }) + '</div>';
+     var infoSections = [];
+     spec.info.description.replace(/^## (.+)$/gm, function(_, t) { infoSections.push(t); });
+     if (infoSections.length) {
+       infoSections.forEach(function(t) {
+         if (t === 'Details') return;
+         var id = 'info-' + t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+         navHtml += '<a class="nav-tag" href="#' + id + '">' + escHtml(t) + '</a>';
+       });
+       navHtml += '<hr class="nav-divider">';
+     }
+   }
+   var tagMap = {};
+   (spec.tags || []).forEach(function (t) {
+     tagMap[t.name] = { description: t.description || '', operations: [] };
+   });
+   var paths = spec.paths || {};
+   Object.keys(paths).forEach(function (path) {
+     Object.keys(paths[path]).forEach(function (method) {
+       var op = paths[path][method];
+       var opTags = op.tags || ['default'];
+       opTags.forEach(function (tagName) {
+         if (!tagMap[tagName]) tagMap[tagName] = { description: '', operations: [] };
+         tagMap[tagName].operations.push({ path: path, method: method, op: op });
+       });
+     });
+   });
+   var groups = spec['x-tagGroups'] || [{ name: 'API', tags: Object.keys(tagMap) }];
+   groups.forEach(function (group) {
+     navHtml += '<div class="nav-group">' + escHtml(group.name) + '</div>';
+     group.tags.forEach(function (tagName) {
+       var tag = tagMap[tagName];
+       if (!tag) return;
+       var tagId = slugify(tagName);
+       navHtml += '<a class="nav-tag" href="#tag-' + tagId + '">' + escHtml(tagName) + '</a>';
+       tag.operations.forEach(function (entry) {
+         var opId = slugify(entry.op.summary || entry.path);
+         navHtml += '<a class="nav-op" href="#op-' + opId + '">' + escHtml(entry.op.summary || entry.path) + '</a>';
+       });
+       html += '<div class="tag-section" id="tag-' + tagId + '">';
+       html += '<h2 class="tag-heading">' + escHtml(tagName) + '</h2>';
+       if (tag.description) html += '<div class="tag-description md-content">' + md(tag.description) + '</div>';
+       tag.operations.forEach(function (entry) { html += renderOperation(entry.path, entry.method, entry.op); });
+       html += '</div><hr class="tag-divider">';
+     });
+   });
+   content.innerHTML = html;
+   nav.innerHTML = navHtml;
+   wireTopbarSearch(spec);
+   wireChat();
+   loadChatConfig();
+   document.querySelectorAll('.pdf-btn').forEach(function (btn) {
+     btn.addEventListener('click', function () {
+       var opDiv = btn.closest('.operation');
+       var opData = JSON.parse(decodeURIComponent(opDiv.getAttribute('data-op')));
+       var path = opDiv.getAttribute('data-path');
+       btn.textContent = '⏳ Generating...';
+       btn.disabled = true;
+       setTimeout(function () {
+         try { generatePDF(opData, path); } catch(e) { console.error(e); }
+         btn.textContent = '⬇ Download PDF';
+         btn.disabled = false;
+       }, 100);
+     });
+   });
+   if (searchInput && !searchInput.getAttribute('data-wired')) {
+     searchInput.setAttribute('data-wired', '1');
+     searchInput.addEventListener('input', function () {
+       var q = (searchInput.value || '').toLowerCase().trim();
+       var tagLinks = Array.prototype.slice.call(nav.querySelectorAll('.nav-tag'));
+       var opLinks = Array.prototype.slice.call(nav.querySelectorAll('.nav-op'));
+       if (!q) { tagLinks.forEach(function (t) { t.style.display = ''; }); opLinks.forEach(function (o) { o.style.display = ''; }); return; }
+       var opMatchByTag = {};
+       opLinks.forEach(function (op) {
+         var match = (op.textContent || '').toLowerCase().indexOf(q) !== -1;
+         op.style.display = match ? '' : 'none';
+         if (match) {
+           var prev = op.previousElementSibling;
+           while (prev && !prev.classList.contains('nav-tag')) prev = prev.previousElementSibling;
+           if (prev) opMatchByTag[prev.getAttribute('href')] = true;
+         }
+       });
+       tagLinks.forEach(function (tag) {
+         var tagMatch = (tag.textContent || '').toLowerCase().indexOf(q) !== -1;
+         tag.style.display = (tagMatch || !!opMatchByTag[tag.getAttribute('href')]) ? '' : 'none';
+       });
+     });
+   }
+   document.querySelectorAll('.tab-btn').forEach(function (btn) {
+     btn.addEventListener('click', function () {
+       var tabId = btn.getAttribute('data-tab');
+       var bar = btn.parentElement;
+       bar.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+       btn.classList.add('active');
+       var section = bar.closest('.payload-section');
+       if (section) section.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+       var target = document.getElementById(tabId);
+       if (target) target.classList.add('active');
+     });
+   });
+   addCollapseToggles();
+   addCopyButtons();
+   wireSchemaToggles();
+   wireSchemaToolbars();
+   if (window.Prism) Prism.highlightAllUnder(document.getElementById('content'));
+   document.querySelectorAll('.example-select').forEach(function(sel) {
+     sel.addEventListener('change', function() {
+       var panelId = sel.getAttribute('data-panel');
+       var panel = document.getElementById(panelId);
+       if (!panel) return;
+       var examplesJson = sel.getAttribute('data-examples');
+       if (!examplesJson) return;
+       try {
+         var examples = JSON.parse(decodeURIComponent(examplesJson));
+         var val = examples[sel.value];
+         if (val !== undefined) {
+           var viewerWrap = panel.querySelector('.json-viewer-wrap');
+           if (viewerWrap) { setJsonViewerData(viewerWrap, val); return; }
+           var pre = panel.querySelector('pre code');
+           if (!pre) return;
+           pre.textContent = JSON.stringify(val, null, 2);
+           if (window.Prism) Prism.highlightElement(pre);
+         }
+       } catch(e) {}
+     });
+   });
+   var allTags = document.querySelectorAll('.nav-tag');
+   var sections = document.querySelectorAll('.tag-section');
+   window.addEventListener('scroll', function () {
+     var scrollY = window.scrollY + 80;
+     var current = '';
+     sections.forEach(function (sec) { if (sec.offsetTop <= scrollY) current = sec.id; });
+     allTags.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+   });
+ }
+ /* ── Load spec ── */
+ fetch('openapi_md.json?v=' + Date.now())
+   .then(function (r) {
+     if (!r.ok) throw new Error('Failed to load openapi_md.json: ' + r.status);
+     return r.json();
+   })
+   .then(render)
+   .catch(function (err) {
+     document.getElementById('content').innerHTML = '<p class="error-msg">Error: ' + escHtml(err.message) + '</p>';
+   });
+ /* ── Font scale ── */
+ var BASE_FONT_PX = 15;
+ var STEP = 0.05, MIN = 0.5, MAX = 2.0, KEY = 'mqtt-font-scale';
+ var saved = parseFloat(localStorage.getItem(KEY));
+ var scale = (saved >= MIN && saved <= MAX) ? saved : 1;
+ var display = document.getElementById('font-scale-value');
+ function applyScale() {
+   scale = Math.round(scale * 100) / 100;
+   document.documentElement.style.fontSize = (BASE_FONT_PX * scale) + 'px';
+   display.textContent = Math.round(scale * 100) + '%';
+   localStorage.setItem(KEY, scale);
+ }
+ applyScale();
+ document.getElementById('font-scale-up').addEventListener('click', function () { if (scale < MAX) { scale += STEP; applyScale(); } });
+ document.getElementById('font-scale-down').addEventListener('click', function () { if (scale > MIN) { scale -= STEP; applyScale(); } });
+ document.getElementById('font-scale-reset').addEventListener('click', function () { scale = 1; applyScale(); });
+})();
+</script>
+</body>
+</html>
