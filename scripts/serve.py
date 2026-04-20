@@ -45,7 +45,7 @@ def generate_config():
    return warnings
 
 def cleanup():
-   """Remove config.json on exit."""
+   """Remove config.json on exit (not called automatically — kept for manual use)."""
    if CONFIG_PATH.exists():
        CONFIG_PATH.unlink()
        print("\n  Config cleaned up.")
@@ -76,7 +76,7 @@ def main():
                super().log_message(format, *args)
    # Handle Ctrl+C
    def handle_exit(sig, frame):
-       cleanup()
+       print("\n  Server stopped. config.json kept for GitHub Pages deployment.")
        exit(0)
    signal.signal(signal.SIGINT, handle_exit)
    with socketserver.TCPServer(("", args.port), QuietHandler) as httpd:

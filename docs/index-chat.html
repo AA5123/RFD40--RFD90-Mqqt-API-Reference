@@ -45,6 +45,7 @@
 <!-- ── Chatbot ── -->
 <div id="chat-bubble" title="Ask API Assistant">💬</div>
 <div id="chat-window">
+<div id="chat-resize-handle" title="Drag to resize"></div>
 <div id="chat-header">
 <div id="chat-header-info">
 <span id="chat-avatar">🤖</span>
@@ -54,6 +55,7 @@
 </div>
 </div>
 <div id="chat-header-actions">
+<button id="chat-size-btn" title="Resize chat window">⊞</button>
 <button id="chat-clear" title="Clear chat">🗑</button>
 <button id="chat-close" title="Close">✕</button>
 </div>
@@ -972,6 +974,54 @@ div.id = 'chat-typing';
      input.style.height = 'auto';
      input.style.height = Math.min(input.scrollHeight, 100) + 'px';
    });
+   /* ── Size toggle (S → M → L → S) ── */
+   var CHAT_SIZES = [
+     { label: '⊟', w: 320, h: 460 },
+     { label: '⊞', w: 420, h: 640 },
+     { label: '⊠', w: 600, h: 800 }
+   ];
+   var chatSizeIdx = 1; /* default: medium */
+   var sizeBtn = document.getElementById('chat-size-btn');
+   if (sizeBtn) {
+     sizeBtn.addEventListener('click', function () {
+       chatSizeIdx = (chatSizeIdx + 1) % CHAT_SIZES.length;
+       var s = CHAT_SIZES[chatSizeIdx];
+       chatWindow.style.width = Math.min(s.w, window.innerWidth - 32) + 'px';
+       chatWindow.style.height = Math.min(s.h, window.innerHeight - 120) + 'px';
+       sizeBtn.textContent = s.label;
+       sizeBtn.title = chatSizeIdx === 0 ? 'Small' : chatSizeIdx === 1 ? 'Medium' : 'Large';
+     });
+   }
+   /* ── Drag-to-resize from top-left handle ── */
+   var resizeHandle = document.getElementById('chat-resize-handle');
+   var isResizing = false;
+   var resizeStartX, resizeStartY, resizeStartW, resizeStartH;
+   if (resizeHandle) {
+     resizeHandle.addEventListener('mousedown', function (e) {
+       isResizing = true;
+       resizeStartX = e.clientX;
+       resizeStartY = e.clientY;
+       resizeStartW = chatWindow.offsetWidth;
+       resizeStartH = chatWindow.offsetHeight;
+       document.body.style.userSelect = 'none';
+       e.preventDefault();
+     });
+     document.addEventListener('mousemove', function (e) {
+       if (!isResizing) return;
+       var dx = resizeStartX - e.clientX;
+       var dy = resizeStartY - e.clientY;
+       var newW = Math.max(280, Math.min(resizeStartW + dx, window.innerWidth - 48));
+       var newH = Math.max(380, Math.min(resizeStartH + dy, window.innerHeight - 120));
+       chatWindow.style.width = newW + 'px';
+       chatWindow.style.height = newH + 'px';
+     });
+     document.addEventListener('mouseup', function () {
+       if (isResizing) {
+         isResizing = false;
+         document.body.style.userSelect = '';
+       }
+     });
+   }
  }
  /* ── Render operation ── */
  function renderOperation(path, method, op) {
