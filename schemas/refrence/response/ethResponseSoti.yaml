@@ -31,9 +31,9 @@ properties:
           status:
             type: string
             enum:
-              - up
-              - down
-            example: up
+              - Connected
+              - Disconnected
+            example: Connected
             description: Current status of the network link.
           linkSpeed:
             type: string

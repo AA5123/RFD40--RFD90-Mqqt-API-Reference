@@ -1,0 +1,46 @@
+{
+  "title": "control_cmd_response",
+  "x-stoplight": {
+    "id": "2vtgd88k3aex0"
+  },
+  "type": "object",
+  "properties": {
+    "command": {
+      "type": "string",
+      "enum": [
+        "control_operation",
+        "set_operating_mode",
+        "get_operating_mode",
+        "set_post_filter"
+      ]
+    },
+    "requestId": {
+      "type": "string",
+      "example": "abc123"
+    },
+    "apiVersion": {
+      "type": "string",
+      "enum": [
+        "V1.0",
+        "V1.1"
+      ],
+      "example": "V1.1"
+    },
+    "payload": {
+      "oneOf": [
+        {
+          "$ref": "../refrence/payload/operatingModePayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/ctrlOprPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/response/postFilterResponse.yaml"
+        }
+      ]
+    },
+    "response": {
+      "$ref": "../refrence/response/response.yaml"
+    }
+  }
+}

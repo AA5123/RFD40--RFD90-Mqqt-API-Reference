@@ -2,11 +2,10 @@ title: deviceStatus
 x-stoplight:
   id: remoc4mkht8l3
 type: object
-description: "Real-time device health — power source, RFID radio state, temperature, battery level and health, NTP clock sync, and paired terminal (phone/tablet) connection."
 properties:
   powerSource:
     type: string
-    description: The source of power for the device (e.g., DC, Wall Charger, USB, or Cradle).
+    description: 'The source of power for the device (e.g., DC, Wall Charger, USB, or Cradle).'
     example: CRADLE
     enum:
       - DC
@@ -15,14 +14,14 @@ properties:
       - CRADLE
   radioActivity:
     type: string
-    description: The activity status of the device's radio (e.g., Active or Inactive).
+    description: 'The activity status of the device''s radio (e.g., Active or Inactive).'
     example: ACTIVE
     enum:
       - INACTIVE
       - ACTIVE
   radioConnection:
     type: string
-    description: The connection status of the device's radio (e.g., Connected or Disconnected).
+    description: 'The connection status of the device''s radio (e.g., Connected or Disconnected).'
     example: CONNECTED
     enum:
       - CONNECTED
@@ -58,14 +57,14 @@ properties:
     properties:
       status:
         type: string
-        description: The connection status of the terminal (e.g., Connected or Disconnected).
+        description: 'The connection status of the terminal (e.g., Connected or Disconnected).'
         enum:
-          - connected
-          - disconnected
-        example: connected
+          - CONNECTED
+          - DISCONNECTED
+        example: CONNECTED
       type:
         type: string
-        description: The type of terminal connection (e.g., Bluetooth, CIO, or USB).
+        description: 'The type of terminal connection (e.g., Bluetooth, CIO, or USB).'
         enum:
           - BLUETOOTH
           - CIO
@@ -74,13 +73,37 @@ properties:
     type: object
     description: Information about the battery status of the device.
     properties:
+      mfgDate:
+        type: string
+        description: The battery manufacture date.
+        example: '2024-01-15'
+      cycleCount:
+        type: integer
+        description: The number of completed battery charge cycles.
+        example: 120
+      fullChargeCapacity:
+        type: integer
+        description: The current full charge capacity of the battery in mAh.
+        example: 3200
+      temperature:
+        type: integer
+        description: The battery temperature in degrees Celsius.
+        example: 32
+      designCapacity:
+        type: integer
+        description: The designed battery capacity in mAh.
+        example: 7000
+      batteryType:
+        type: string
+        description: The battery chemistry/type.
+        example: Li-ion
       capacity:
         type: integer
         description: The battery capacity remaining in mAh.
-        example: 21
+        example: 5000
       stateOfHealth:
         type: string
-        description: The overall health of the battery (e.g., Good, Average, or Poor).
+        description: 'The overall health of the battery (e.g., Good, Average, or Poor).'
         example: GOOD
         enum:
           - GOOD
@@ -103,5 +126,5 @@ required:
   - radioActivity
   - radioConnection
   - hostname
-  - 'systemTime '
+  - systemTime
   - temperature

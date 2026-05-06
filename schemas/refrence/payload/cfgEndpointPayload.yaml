@@ -9,8 +9,9 @@ properties:
     enum:
       - add
       - delete
+      - update
     example: add
-    description: Specifies the type of operation to perform, either adding or deleting a configuration.
+    description: Specifies the type of operation to perform, either adding, deleting, or updating a configuration.
   configuration:
     type: object
     required:
@@ -60,7 +61,7 @@ properties:
       activate:
         type: boolean
         default: false
-        description: Indicates whether the endpoint is active or inactive.
+        description: Set to true to activate the endpoint to which MQTT connections will be made.
       url:
         type: string
         example: soti.example.com
@@ -93,17 +94,17 @@ properties:
             type: integer
             maximum: 65535
             example: 300
-            description: Specifies the keep-alive interval in seconds for MQTT connections.
+            description: Specifies the keep-alive interval in seconds when client is idle.
           cleanSession:
             type: boolean
             default: true
             description: Indicates whether to start a clean session for the MQTT client.
           reconnectDelayMin:
             type: integer
-            description: Specifies the minimum delay in seconds before reconnecting.
+            description: Specifies the minimum delay in seconds before reconnecting when a connection is lost.
           reconnectDelayMax:
             type: integer
-            description: Specifies the maximum delay in seconds before reconnecting.
+            description: Specifies the maximum delay in seconds before reconnecting when a connection is lost.
           clientId:
             type: string
             example: zebra-rfd40-01

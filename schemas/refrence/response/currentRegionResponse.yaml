@@ -2,7 +2,6 @@ title: currentRegion
 x-stoplight:
   id: 380edc8b7805d
 type: object
-description: "Regulatory radio configuration — country, regulatory standard, available frequency channels, transmit power limits, frequency hopping, and Listen Before Talk settings. These are factory-set and cannot be changed."
 examples: []
 properties:
   frequencyHopping:
@@ -17,7 +16,7 @@ properties:
   country:
     type: string
     example: USA
-    description: The country for which the device is configured.
+    description: The country for ehich the device is configured to.
   lbtEnabled:
     type: boolean
     description: Specifies if Listen Before Talk (LBT) is enabled for the region.

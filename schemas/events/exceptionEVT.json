@@ -1,7 +1,6 @@
 {
   "title": "exceptions",
-  "x-tag": "Exceptions",
-  "description": "This event captures details about exception events in the IOTC system, including metadata and component-specific errors.",
+  "description": "This event captures details about exception events in the IOTC system, including metadata and component-specific errors. Note: this is currently not supported.",
   "x-stoplight": {
     "id": "ey6vjtuwborhz"
   },

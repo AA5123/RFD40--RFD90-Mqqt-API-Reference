@@ -1,76 +1,23 @@
 {
   "title": "install_certificate",
-  "x-tag": "Certificate Management",
   "type": "object",
   "x-stoplight": {
     "id": "8ji89je0bi6sq"
   },
   "description": "This API is used to install certificates. ",
   "examples": [
-    { 
-  "command": "install_certificate", 
-  "requestId": "abc123", 
-  "certDetails": { 
-    "name": "sotiAgent", 
-    "type": "wifi", 
-    "authenticationType": "CERTIFICATE", 
-    "url": [ 
-      { 
-        "key": "ca_cert", 
-        "value": "http://localhost/ca_cert.pem" 
-      }, 
-      { 
-        "key": "client_key", 
-        "value": "http://localhost/client_key.pem" 
-      }, 
-      { 
-        "key": "client_cert", 
-        "value": "http://localhost/client_cert.pem" 
-      }, 
-      { "key": "cert_key_password",
-        "value": "amnin@123" 
-      } 
-    ], 
-    "pfxPassword": "pass@123", 
-    "verificationType": "VERIFY_HOST", 
-    "caCertificateFileContent": "----BEGIN---- cert content ----END---" 
-
-  } 
-} ,
-    {
-      "command": "install_certificate",
-      "requestId": "18996",
-      "certDetails": {
-        "type": "filestore",
-        "authenticationType": "CERTIFICATE",
-        "url": [
-          {
-            "key": "ca_cert",
-            "value": "http://scp000555.soticonnect.cloud:4650/cm/api/root-download"
-          }
-        ],
-        "verificationType": "VERIFY_HOST"
-      }
-    },
     {
       "command": "install_certificate",
       "requestId": "19001",
       "certDetails": {
-        "name": "mqtt_client",
-        "type": "mqtt",
+        "name": "root_certs",
+        "type": "filestore",
         "authenticationType": "CERTIFICATE",
+        "certSource": "HTTP",
         "url": [
           {
-            "key": "client_cert",
-            "value": "https://certserver.company.com/api/client-cert"
-          },
-          {
-            "key": "client_key",
-            "value": "https://certserver.company.com/api/client-key"
-          },
-          {
             "key": "ca_cert",
-            "value": "https://certserver.company.com/api/ca-cert"
+            "value": "http://192.168.0.107:8080/filestore_ca_cert.pem"
           }
         ],
         "verificationType": "VERIFY_HOST_PEER"
@@ -78,36 +25,65 @@
     },
     {
       "command": "install_certificate",
-      "requestId": "19002",
+      "requestId": "19001",
       "certDetails": {
-        "name": "secure_server",
-        "type": "server",
-        "authenticationType": "BASIC",
+        "name": "mqtt_certs",
+        "type": "mqtt",
+        "authenticationType": "CERTIFICATE",
+        "certSource": "HTTP",
         "url": [
           {
             "key": "client_cert",
-            "value": "https://pki.enterprise.com/download/server.crt"
+            "value": "http://192.168.0.107:8080/mqtt_client_cert.pem"
           },
           {
             "key": "client_key",
-            "value": "https://pki.enterprise.com/download/server.key"
+            "value": "http://192.168.0.107:8080/mqtt_client_key.pem"
           },
           {
             "key": "ca_cert",
-            "value": "https://pki.enterprise.com/download/root-ca.crt"
-          },
-          {
-            "key": "cert_key_password",
-            "value": "encryptedKeyPassword123"
+            "value": "http://192.168.0.107:8080/mqtt_ca_cert.pem"
           }
         ],
-        "authenticateOptions": {
-          "username": "certadmin",
-          "password": "securePass456"
-        },
-        "verificationType": "VERIFY_PEER"
+        "verificationType": "VERIFY_HOST_PEER"
       }
-    }
+    },
+    {
+      "command": "install_certificate",
+      "requestId": "abc456",
+      "certDetails": {
+        "name": "wifi_test",
+        "type": "wifi",
+        "authenticationType": "NONE",
+        "url": [
+          {
+            "key": "client_cert",
+            "value": "http://192.168.0.107:8080/wifi_client_cert.pem"
+          },
+          {
+            "key": "ca_cert",
+            "value": "http://192.168.0.107:8080/wifi_ca_cert.pem"
+          },
+          {
+            "key": "client_key",
+            "value": "http://192.168.0.107:8080/wifi_client_key.pem"
+          }
+        ],
+        "verificationType": "NONE"
+      }
+    },
+    {
+      "requestId": "0001",
+      "command": "install_certificate",
+      "certDetails": {
+        "type": "wifi",
+        "authenticationType": "NONE",
+        "certSource": "DIRECT",
+        "certificateBundle": {
+          "ca_cert": "-----BEGIN CERTIFICATE-----\n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\nfE5gqNCequc7cftY6rCanls=\n-----END CERTIFICATE-----"
+        }
+      }
+  }
   ],
   "properties": {
     "command": {

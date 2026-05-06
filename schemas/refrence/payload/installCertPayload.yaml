@@ -7,7 +7,7 @@ properties:
   name:
     type: string
     example: sotiAgent
-    description: The name of the certificate, typically representing the application or agent.
+    description: 'A logical name for the certificate entry, typically representing the application, service, or agent.'
   type:
     type: string
     example: client
@@ -17,7 +17,7 @@ properties:
       - mqtt
       - wifi
       - filestore
-    description: The type of the certificate, indicating its purpose or usage (e.g., client, server, etc.).
+    description: Certificate category that identifies where the certificate is used.
   authenticationType:
     type: string
     enum:
@@ -26,37 +26,60 @@ properties:
       - TOKEN
       - CERTIFICATE
     example: BASIC
-    description: Specifies the authentication method required. If BASIC, username and password are required. If NONE, no authentication credentials are needed.
+    description: |-
+      Specifies the authentication method used to access the remote certificate source.
+      - `NONE`: No authentication is used.
+      - `BASIC`: HTTP Basic authentication using username and password. In this case, `authenticateOptions` is required.
+      - `TOKEN`: Token-based authentication. This option is currently not supported.
+      - `CERTIFICATE`: Certificate-based authentication used to download or retrieve certificates.
+  certSource:
+    type: string
+    enum:
+      - HTTP
+      - DIRECT
+    example: HTTP
+    description: |-
+      Specifies how certificate content is supplied for installation. This field is optional.
+      If omitted, the default behavior is `HTTP`, and the device attempts to download certificate content from the URLs provided in `url`.
+      - `DIRECT`: Certificate content is provided inline in `certificateBundle`.
+      - `HTTP`: Certificate content is downloaded from remote URLs in `url`.
+      For `HTTP` with `authenticationType` set to `CERTIFICATE`, authentication can use inline certificate content in `caCertificateFileContent` or an already installed filestore certificate.
   url:
     type: array
+    description: A list of key-value entries that map certificate components to downloadable URLs.
     items:
       type: object
       properties:
         key:
           type: string
-          description: The key for the URL parameter.
+          description: The certificate component identifier.
+          enum:
+            - ca_cert
+            - client_key
+            - client_cert
+            - cert_key_password
         value:
           type: string
-          description: The value associated with the URL parameter.
-    description: A list of key-value pairs representing URL parameters.
+          description: 'The URL for the specified component. For `cert_key_password`, this is the key password value.'
   authenticateOptions:
     type: object
+    description: Authentication options for credential-based access. Required when `authenticationType` is `BASIC`.
     properties:
       username:
         type: string
         example: rfid
-        description: The username for authentication when required.
+        description: Username used for HTTP Basic authentication.
       password:
         type: string
         example: rfid
-        description: The password for authentication when required.
-    description: Options for authentication, including username and password.
+        description: Password used for HTTP Basic authentication.
   pfxPassword:
     type: string
     example: pass@123
-    description: The password for the PFX (Personal Information Exchange) file used in secure communications.
+    description: Password for the PFX (PKCS#12) bundle when a PFX certificate is provided. This field is currently not supported for RFD40/90.
   headerParams:
     type: array
+    description: A list of key-value pairs representing HTTP header parameters. This field is currently not supported.
     items:
       type: object
       properties:
@@ -66,9 +89,9 @@ properties:
         value:
           type: string
           description: The value associated with the HTTP header parameter.
-    description: A list of key-value pairs representing HTTP header parameters.
   queryParams:
     type: array
+    description: A list of key-value pairs representing query parameters. This field is currently not supported.
     items:
       type: object
       properties:
@@ -78,7 +101,6 @@ properties:
         value:
           type: string
           description: The value associated with the query parameter.
-    description: A list of key-value pairs representing query parameters.
   verificationType:
     type: string
     enum:
@@ -87,10 +109,32 @@ properties:
       - VERIFY_HOST
       - VERIFY_HOST_PEER
     example: NONE
-    description: Specifies the type of verification to perform, such as peer verification or host verification.
+    description: Specifies the TLS verification mode used when validating remote endpoints.
+  certificateBundle:
+    type: object
+    description: |-
+      Optional inline certificate payload used when `certSource` is `DIRECT`.
+      Provide certificate content for one certificate `type`: `client`, `server`, `mqtt`, `wifi`, or `filestore`.
+    properties:
+      ca_cert:
+        type: string
+        description: 'Inline CA certificate content, typically in PEM or base64-encoded form.'
+      client_key:
+        type: string
+        description: 'Inline client private key content, typically in PEM or base64-encoded form.'
+      client_cert:
+        type: string
+        description: 'Inline client certificate content, typically in PEM or base64-encoded form.'
+      cert_key_password:
+        type: string
+        description: 'Password used to decrypt an encrypted client private key, when required.'
   caCertificateFileContent:
     type: string
-    description: The content of the CA (Certificate Authority) certificate file, used for verifying identities.
+    description: |-
+      Optional inline certificate content used only for remote certificate download authentication.
+      - Not applicable when `certSource` is `DIRECT`.
+      - Applicable only when `certSource` is `HTTP` and `authenticationType` is `CERTIFICATE`.
+      - If applicable and this field is empty, the device uses an already installed filestore certificate for authentication.
 required:
   - type
   - authenticationType

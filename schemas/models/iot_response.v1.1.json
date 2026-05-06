@@ -1,0 +1,88 @@
+{
+  "title": "response",
+  "x-stoplight": {
+    "id": "7h3gfwv8a2kta"
+  },
+  "type": "object",
+  "examples": [],
+  "properties": {
+    "command": {
+      "type": "string",
+      "enum": [
+        "get_version",
+        "get_status",
+        "reboot",
+        "get_current_region",
+        "set_os",
+        "get_config",
+        "set_config",
+        "get_wifi",
+        "set_wifi",
+        "install_certificate",
+        "delete_certificate",
+        "get_installed_certificates",
+        "config_endpoint",
+        "config_events",
+        "get_endpoint_config",
+        "delete_wifi_profile"
+      ],
+      "description": "Name of the command being responded to"
+    },
+    "requestId": {
+      "description": "16 hex digit identifier",
+      "type": "string",
+      "example": "abc123"
+    },
+    "apiVersion": {
+      "description": "Provides IOT API version",
+      "type": "string",
+      "example": "V1.1"
+    },
+    "payload": {
+      "oneOf": [
+        {
+          "$ref": "../refrence/response/readerVersionResponse.yaml"
+        },
+        {
+          "$ref": "../refrence/response/deviceStatusResponse.yaml"
+        },
+        {
+          "$ref": "../refrence/response/currentRegionResponse.yaml"
+        },
+        {
+          "$ref": "../refrence/response/ethResponseSoti.yaml"
+        },
+        {
+          "$ref": "../refrence/response/wifiResponseSoti.yaml"
+        },
+        {
+          "$ref": "../refrence/response/installedCertResponse.yaml"
+        },
+        {
+          "$ref": "../refrence/response/epConfigurationSoti.yaml"
+        },
+        {
+          "$ref": "../refrence/response/getWifiResponse.yaml"
+        },
+        {
+          "$ref": "../refrence/response/endpointResponse.yaml"
+        },
+        {
+          "$ref": "../refrence/response/setConfigResponse.yaml"
+        },
+        {
+          "$ref": "../refrence/response/getConfigResponse.yaml"
+        }
+      ]
+    },
+    "response": {
+      "$ref": "../refrence/response/response.yaml"
+    }
+  },
+  "required": [
+    "command",
+    "requestId",
+    "apiVersion",
+    "response"
+  ]
+}

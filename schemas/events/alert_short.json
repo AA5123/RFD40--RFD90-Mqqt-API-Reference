@@ -1,6 +1,5 @@
 {
   "title": "alert_short",
-  "x-tag": "Alerts",
   "x-stoplight": {
     "id": "ps4oql8nfry5a"
   },
@@ -31,13 +30,45 @@
       "description": "WiFi configuration failed"
     },
     {
-      "id": "MQTT_INSTALL_CERTIFICATE_SUCCESS",
-      "timestamp": "11:45:18",
+      "id": "MQTT_ROOT_CERT_DOWNLOAD_SUCCESS",
+      "timestamp": "2026-04-17T05:09:13.805Z",
       "type": "NOTIFICATION",
-      "priority": "LOW",
+      "priority": "HIGH",
       "messageID": "ZEBRA_RFID_HH_ALERTS",
-      "description": "MQTT certificate installed successfully"
-    }
+      "description": "MQTT root certificate download success"
+    },
+    {
+      "id": "MQTT_ROOT_CERT_INSTALL_SUCCESS",
+      "timestamp": "2026-04-17T05:09:13.808Z",
+      "type": "NOTIFICATION",
+      "priority": "HIGH",
+      "messageID": "ZEBRA_RFID_HH_ALERTS",
+      "description": "MQTT root certificate install success"
+   },
+   {
+    "id": "WIFI_CLIENT_CERT_DOWNLOAD_SUCCESS",
+    "timestamp": "2026-04-17T05:09:57.351Z",
+    "type": "NOTIFICATION",
+    "priority": "HIGH",
+    "messageID": "ZEBRA_RFID_HH_ALERTS",
+    "description": "Wi-Fi client certificate download success"
+   },
+   {
+    "id": "WIFI_CLIENT_CERT_INSTALL_SUCCESS",
+    "timestamp": "2026-04-17T05:09:57.354Z",
+    "type": "NOTIFICATION",
+    "priority": "HIGH",
+    "messageID": "ZEBRA_RFID_HH_ALERTS",
+    "description": "Wi-Fi client certificate install success"
+  },
+  {
+    "id": "FILESTORE_CLIENT_KEY_DOWNLOAD_FAIL",
+    "timestamp": "2026-04-17T05:10:15.538Z",
+    "type": "NOTIFICATION",
+    "priority": "HIGH",
+    "messageID": "ZEBRA_RFID_HH_ALERTS",
+    "description": "Filestore client key download fail"
+  }
   ],
   "properties": {
     "id": {
@@ -65,20 +96,44 @@
         "MQTT_INSTALL_CERTIFICATE_FAIL",
         "MQTT_CLIENT_CERT_DOWNLOAD_FAIL",
         "MQTT_CLIENT_CERT_DOWNLOAD_SUCCESS",
+        "MQTT_CLIENT_KEY_DOWNLOAD_FAIL",
+        "MQTT_CLIENT_KEY_DOWNLOAD_SUCCESS", 
         "MQTT_ROOT_CERT_DOWNLOAD_FAIL",
         "MQTT_ROOT_CERT_DOWNLOAD_SUCCESS",
         "WIFI_INSTALL_CERTIFICATE_SUCCESS",
         "WIFI_INSTALL_CERTIFICATE_FAIL",
         "WIFI_CLIENT_CERT_DOWNLOAD_FAIL",
         "WIFI_CLIENT_CERT_DOWNLOAD_SUCCESS",
+        "WIFI_CLIENT_KEY_DOWNLOAD_FAIL",
+        "WIFI_CLIENT_KEY_DOWNLOAD_SUCCESS",
         "WIFI_ROOT_CERT_DOWNLOAD_FAIL",
         "WIFI_ROOT_CERT_DOWNLOAD_SUCCESS",
         "FILESTORE_INSTALL_CERTIFICATE_SUCCESS",
         "FILESTORE_INSTALL_CERTIFICATE_FAIL",
         "FILESTORE_CLIENT_CERT_DOWNLOAD_FAIL",
         "FILESTORE_CLIENT_CERT_DOWNLOAD_SUCCESS",
+        "FILESTORE_CLIENT_KEY_DOWNLOAD_FAIL",
+        "FILESTORE_CLIENT_KEY_DOWNLOAD_SUCCESS",
         "FILESTORE_ROOT_CERT_DOWNLOAD_FAIL",
-        "FILESTORE_ROOT_CERT_DOWNLOAD_SUCCESS"
+        "FILESTORE_ROOT_CERT_DOWNLOAD_SUCCESS",
+        "MQTT_ROOT_CERT_INSTALL_SUCCESS",
+        "MQTT_ROOT_CERT_INSTALL_FAIL",
+        "MQTT_CLIENT_CERT_INSTALL_SUCCESS",
+        "MQTT_CLIENT_CERT_INSTALL_FAIL",
+        "MQTT_CLIENT_KEY_INSTALL_SUCCESS",
+        "MQTT_CLIENT_KEY_INSTALL_FAIL",
+        "WIFI_ROOT_CERT_INSTALL_SUCCESS",
+        "WIFI_ROOT_CERT_INSTALL_FAIL",
+        "WIFI_CLIENT_CERT_INSTALL_SUCCESS",
+        "WIFI_CLIENT_CERT_INSTALL_FAIL",
+        "WIFI_CLIENT_KEY_INSTALL_SUCCESS",
+        "WIFI_CLIENT_KEY_INSTALL_FAIL",
+        "FILESTORE_ROOT_CERT_INSTALL_SUCCESS",
+        "FILESTORE_ROOT_CERT_INSTALL_FAIL",
+        "FILESTORE_CLIENT_CERT_INSTALL_SUCCESS",
+        "FILESTORE_CLIENT_CERT_INSTALL_FAIL",
+        "FILESTORE_CLIENT_KEY_INSTALL_SUCCESS",
+        "FILESTORE_CLIENT_KEY_INSTALL_FAIL"
       ],
       "example": "FIRMWARE_DOWNLOAD_SUCCESS",
       "description": "The unique identifier for the alert, representing the specific type of event or notification."

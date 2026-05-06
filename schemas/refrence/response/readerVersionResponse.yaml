@@ -2,7 +2,6 @@ title: readerVersion
 x-stoplight:
   id: e2effa15ae429
 type: object
-description: "Scanner identity — model, serial number, SKU, and firmware versions for the main device, barcode scanner, RFID radio, and IoT Connector. These values only change after a firmware update."
 examples: []
 properties:
   firmwareVersion:
@@ -15,7 +14,7 @@ properties:
     enum:
       - RFD40
       - RFD90
-    description: The model of the reader, such as RFD40 or RFD90.
+    description: 'The model of the reader, such as RFD40 or RFD90.'
   serialNumber:
     type: string
     example: '23053520102096'
@@ -24,6 +23,18 @@ properties:
     type: string
     example: RFD4031-G10B700-US
     description: The stock keeping unit (SKU) identifier for the reader.
+  companyName:
+    type: string
+    example: Zebra Technologies
+    enum:
+      - Zebra Technologies
+    description: The company name associated with the reader.
+  manufacturerName:
+    type: string
+    example: Zebra Technologies
+    enum:
+      - Zebra Technologies
+    description: The manufacturer name associated with the reader.
   detailedVersions:
     type: object
     description: Detailed version information for the reader.
@@ -47,3 +58,5 @@ required:
   - model
   - serialNumber
   - sku
+  - companyName
+  - manufacturerName

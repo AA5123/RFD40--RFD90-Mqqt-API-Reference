@@ -10,24 +10,69 @@
       "requestId": "abc123",
       "apiVersion": "V1.1",
       "installedCerts": {
-      "certInfo": [
-        {
-          "name": "MQTT_ca_cert",
-          "type": "server",
-          "installTime": "2022-07-01T03:01:31.464Z",
-          "publicKeyAlg": "RSA256",
-          "publicKey": "091234acgbe12",
-          "serial": "410835777",
-          "validFrom": "2022-07-01",
-          "validTill": "2023-07-01"
-        }
-      ]
-    },
-    "response": {
-      "code": 0,
-      "description": "Success"
+        "certInfo": [
+          {
+            "name": "ca_cert",
+            "type": "filestore",
+            "issuerName": "SotiConnectRoot",
+            "publicKeyAlg": "RSA",
+            "publicKey": "RSA",
+            "serial": "ed:83:dd:4a:47:dd:07:98",
+            "subjectName": "SotiConnectRoot",
+            "validFrom": "2024-07-01T07:00:00Z",
+            "validTill": "2034-02-28T15:18:47Z"
+          },
+          {
+            "name": "ca_cert",
+            "type": "wifi",
+            "issuerName": "CA",
+            "publicKeyAlg": "RSA",
+            "publicKey": "RSA",
+            "serial": "1e:e0:12:f6:75:68:39:f1",
+            "subjectName": "CA",
+            "validFrom": "2024-07-01T07:00:00Z",
+            "validTill": "2025-04-16T07:26:35Z"
+          },
+          {
+            "name": "ca_cert",
+            "type": "mqtt",
+            "issuerName": "SOTI-mqtt-ca",
+            "publicKeyAlg": "RSA",
+            "publicKey": "RSA",
+            "serial": "7d:1b:c5:9f:ea:ff:0f:56",
+            "subjectName": "SOTI-mqtt-ca",
+            "validFrom": "2024-07-01T07:00:00Z",
+            "validTill": "2038-01-19T03:14:07Z"
+          },
+          {
+            "name": "client_cert",
+            "type": "mqtt",
+            "issuerName": "RootCA",
+            "publicKeyAlg": "RSA",
+            "publicKey": "RSA",
+            "serial": "1",
+            "subjectName": "Client",
+            "validFrom": "2024-07-01T07:00:00Z",
+            "validTill": "2030-05-06T08:06:57Z"
+          },
+          {
+            "name": "client_cert",
+            "type": "wifi",
+            "issuerName": "CA",
+            "publicKeyAlg": "RSA",
+            "publicKey": "RSA",
+            "serial": "26:00:16:e0:c4:a1:b5:00",
+            "subjectName": "CLIENT",
+            "validFrom": "2024-07-01T07:00:00Z",
+            "validTill": "2025-04-16T07:27:52Z"
+          }
+        ]
+      },
+      "response": {
+        "code": 0,
+        "description": "Success"
+      }
     }
-  }
   ],
   "properties": {
     "command": {

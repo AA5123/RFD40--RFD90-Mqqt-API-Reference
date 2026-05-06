@@ -16,7 +16,7 @@
       "hostname": "RFD40-24190525100354",
       "macAddress": "E0-D0-45-3D-38-1D",
       "linkStatus": {
-        "status": "up",
+        "status": "Connected",
         "linkSpeed": "100Mbps"
       },
       "ipv4Configuration": {
@@ -31,6 +31,21 @@
   },
   "response": {
     "code": "0",
+    "description": "Success"
+  }
+},
+{
+  "command": "get_eth",
+  "requestId": "abc123",
+  "apiVersion": "V1.1",
+  "ethConfig": {
+    "interfaceDetails": {
+      "interfaceName": "eth0",
+      "status": "Disabled"
+    }
+  },
+  "response": {
+    "code": 0,
     "description": "Success"
   }
 }

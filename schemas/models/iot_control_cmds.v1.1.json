@@ -1,0 +1,36 @@
+{
+  "title": "control_cmds",
+  "x-stoplight": {
+    "id": "71accf05dd055"
+  },
+  "type": "object",
+  "properties": {
+    "command": {
+      "type": "string",
+      "enum": [
+        "control_operation",
+        "set_operating_mode",
+        "get_operating_mode",
+        "set_post_filter"
+      ]
+    },
+    "requestId": {
+      "type": "string",
+      "example": "abc123"
+    },
+    "payload": {
+      "oneOf": [
+        {
+          "$ref": "../refrence/payload/operatingModePayload.yaml",
+          "description": "Represents the reader operating mode."
+        },
+        {
+          "$ref": "../refrence/payload/ctrlOprPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/postFilterPayload.yaml"
+        }
+      ]
+    }
+  }
+}

@@ -18,12 +18,12 @@ OUTPUT_PATH = os.path.join(PROJECT_ROOT, "docs", "openapi_md.json")
 COMMANDS_DIR = os.path.join(SCHEMAS_DIR, "commands")
 RESPONSE_DIR = os.path.join(SCHEMAS_DIR, "response")
 EVENTS_DIR = os.path.join(SCHEMAS_DIR, "events")
-TAG_CONFIG_PATH = os.path.join(SCHEMAS_DIR, "tag_config.json")
-ERROR_CODES_PATH = os.path.join(SCHEMAS_DIR, "error_codes.json")
-OP_DESCRIPTIONS_DIR = os.path.join(SCHEMAS_DIR, "operation_descriptions")
+TAG_CONFIG_PATH = os.path.join(PROJECT_ROOT, "tag_config.json")
+ERROR_CODES_PATH = os.path.join(PROJECT_ROOT, "error_codes.json")
+OP_DESCRIPTIONS_DIR = os.path.join(PROJECT_ROOT, "operation_descriptions")
 EXAMPLE_DESC_PATH = os.path.join(SCHEMAS_DIR, "example_description.json")
-TAG_DESCRIPTIONS_DIR = os.path.join(SCHEMAS_DIR, "tag_descriptions")
-INFO_DESCRIPTION_PATH = os.path.join(SCHEMAS_DIR, "info_description.md")
+TAG_DESCRIPTIONS_DIR = os.path.join(PROJECT_ROOT, "tag_descriptions")
+INFO_DESCRIPTION_PATH = os.path.join(PROJECT_ROOT, "info_description.md")
 SKIP_FILES = set()
 
 def load_json(filepath):
@@ -102,7 +102,9 @@ def load_tag_descriptions_from_md():
            print(f"  Loaded tag description: '{tag_name}' from {filename}")
    return descriptions
 
-def discover_operations():
+def discover_operations(operation_tags=None):
+   if operation_tags is None:
+       operation_tags = {}
    operations = []
    if os.path.isdir(COMMANDS_DIR):
        for subfolder in sorted(os.listdir(COMMANDS_DIR)):
@@ -114,30 +116,22 @@ def discover_operations():
                    continue
                filepath = os.path.join(subfolder_path, filename)
                op_name = filename[:-5]
-               try:
-                   data = load_json(filepath)
-                   tag = data.get("x-tag")
-                   if not tag:
-                       print(f"  WARNING: {filepath} has no x-tag, skipping")
-                       continue
-                   operations.append((op_name, tag, subfolder, filepath))
-               except Exception as exc:
-                   print(f"  WARNING: Error reading {filepath}: {exc}")
+               tag = operation_tags.get(op_name)
+               if not tag:
+                   print(f"  WARNING: '{op_name}' has no entry in operation_tags (tag_config.json), skipping")
+                   continue
+               operations.append((op_name, tag, subfolder, filepath))
    if os.path.isdir(EVENTS_DIR):
        for filename in sorted(os.listdir(EVENTS_DIR)):
            if not filename.endswith(".json") or filename in SKIP_FILES:
                continue
            filepath = os.path.join(EVENTS_DIR, filename)
            op_name = filename[:-5]
-           try:
-               data = load_json(filepath)
-               tag = data.get("x-tag")
-               if not tag:
-                   print(f"  WARNING: {filepath} has no x-tag, skipping")
-                   continue
-               operations.append((op_name, tag, "events", filepath))
-           except Exception as exc:
-               print(f"  WARNING: Error reading {filepath}: {exc}")
+           tag = operation_tags.get(op_name)
+           if not tag:
+               print(f"  WARNING: '{op_name}' has no entry in operation_tags (tag_config.json), skipping")
+               continue
+           operations.append((op_name, tag, "events", filepath))
    return operations
 
 def get_response_path(operation, source):
@@ -257,11 +251,9 @@ def build_openapi():
    example_data = load_example_descriptions()
    error_codes_map = load_error_codes()
    tag_groups = tag_config.get("tag_groups", {})
-   tag_descriptions = {
-       **tag_config.get("tag_descriptions", {}),
-       **load_tag_descriptions_from_md(),
-   }
-   operations = discover_operations()
+   tag_descriptions = load_tag_descriptions_from_md()
+   operation_tags = tag_config.get("operation_tags", {})
+   operations = discover_operations(operation_tags)
    operations = sort_operations(operations, tag_config)
    print(f"  Discovered {len(operations)} operations")
    used_tags = OrderedDict()

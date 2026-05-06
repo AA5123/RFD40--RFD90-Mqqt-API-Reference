@@ -1,0 +1,64 @@
+{
+    "tag_groups": {
+        "Management": [
+            "Device Status",
+            "Device Configuration",
+            "Network Configuration",
+            "MQTT Endpoint Configuration",
+            "Certificate Management",
+            "System Operations"
+        ],
+        "Control": [
+            "Inventory Control",
+            "Operating Mode",
+            "Tag Filtering"
+        ],
+        "Events": [
+            "Device Health",
+            "Alerts",
+            "Exceptions",
+            "MQTT Connectivity",
+            "Event Configuration"
+        ],
+        "Data": [
+            "Tag Data Event"
+        ]
+    },
+    "operation_tags": {
+        "get_status": "Device Status",
+        "get_version": "Device Status",
+        "get_current_region": "Device Status",
+        "get_config": "Device Configuration",
+        "set_config": "Device Configuration",
+        "delete_wifi_profile": "Network Configuration",
+        "get_eth": "Network Configuration",
+        "get_wifi": "Network Configuration",
+        "set_wifi": "Network Configuration",
+        "config_endpoint": "MQTT Endpoint Configuration",
+        "get_endpoint_config": "MQTT Endpoint Configuration",
+        "delete_certificate": "Certificate Management",
+        "get_installed_certificate": "Certificate Management",
+        "install_certificate": "Certificate Management",
+        "reboot": "System Operations",
+        "set_os": "System Operations",
+        "control_operation": "Inventory Control",
+        "get_operating_mode": "Operating Mode",
+        "set_operating_mode": "Operating Mode",
+        "get_post_filter": "Tag Filtering",
+        "set_post_filter": "Tag Filtering",
+        "config_events": "Event Configuration",
+        "heartBeatEVT": "Device Health",
+        "alerts": "Alerts",
+        "alert_short": "Alerts",
+        "exceptionEVT": "Exceptions",
+        "mqttConnEVT": "MQTT Connectivity",
+        "dataEVT": "Tag Data Event"
+    },
+    "operation_order": {
+        "Device Status": [
+            "get_status",
+            "get_version",
+            "get_current_region"
+        ]
+    }
+}

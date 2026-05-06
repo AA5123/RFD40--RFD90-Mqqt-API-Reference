@@ -1,0 +1,77 @@
+{
+  "title": "command",
+  "x-stoplight": {
+    "id": "pqto6xftzke43"
+  },
+  "type": "object",
+  "examples": [],
+  "properties": {
+    "command": {
+      "type": "string",
+      "enum": [
+        "get_version",
+        "get_status",
+        "reboot",
+        "get_current_region",
+        "set_os",
+        "get_config",
+        "set_config",
+        "get_wifi",
+        "set_wifi",
+        "install_certificate",
+        "delete_certificate",
+        "get_installed_certificates",
+        "config_endpoint",
+        "config_events",
+        "get_endpoint_config",
+        "delete_wifi_profile"
+      ],
+      "description": "Name of the command being requested",
+      "minLength": 0,
+      "maxLength": 256
+    },
+    "requestId": {
+      "type": "string",
+      "description": "16 hex digit identifier",
+      "example": "abc123"
+    },
+    "payload": {
+      "oneOf": [
+        {
+          "$ref": "../refrence/payload/osUpdatePayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/cfgWifiPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/ethConfigPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/installCertPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/cfgEventPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/cfgEndpointPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/setCfgPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/delCertPayload.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/delWifiProfile.yaml"
+        },
+        {
+          "$ref": "../refrence/payload/epName.yaml"
+        }
+      ]
+    }
+  },
+  "required": [
+    "command",
+    "requestId"
+  ]
+}

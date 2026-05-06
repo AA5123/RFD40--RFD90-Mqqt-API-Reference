@@ -4,49 +4,46 @@
     "id": "24fcpat4g238u"
   },
   "type": "object",
-  "examples":[
+  "examples": [
     {
-  "command": "get_status",
-  "requestId": "abcd123",
-  "apiVersion": "V1.1",
-  "deviceStatus": {
-    "powerSource": "USB",
-    "radioActivity": "INACTIVE",
-    "radioConnection": "CONNECTED",
-    "systemTime": "2024-02-26T13:45:53.728Z",
-    "temperature": 32,
-    "ntp": {
-      "offset": 0,
-      "reach": 0
-    },
-    "terminalConnection": {
-      "status": "CONNECTED",
-      "type": "USB"
-    },
-    "batteryStatus": {
-      "capacity": 6400,
-      "stateOfHealth": "GOOD",
-      "chargePercentage": 100,
-      "chargeStatus": 1
+      "command": "get_status",
+      "requestId": "abc123",
+      "apiVersion": "V1.1",
+      "deviceStatus": {
+        "powerSource": "USB",
+        "radioActivity": "INACTIVE",
+        "radioConnection": "CONNECTED",
+        "systemTime": "2024-02-26T13:45:53.728Z",
+        "temperature": 32,
+        "ntp": {
+          "offset": 0,
+          "reach": 0
+        },
+        "terminalConnection": {
+          "status": "CONNECTED",
+          "type": "USB"
+        },
+        "batteryStatus": {
+          "capacity": 6400,
+          "stateOfHealth": "GOOD",
+          "chargePercentage": 100,
+          "chargeStatus": 1
+        }
+      },
+      "response": {
+        "code": 0,
+        "description": "Success"
+      }
     }
-  },
-  "response": {
-    "code": 0,
-    "description": "Success"
-  }
-}
-
   ],
   "properties": {
     "command": {
       "type": "string",
-      "example": "get_status",
-      "description": "Echoes back the command name — always `get_status` for this response."
+      "example": "get_status"
     },
     "requestId": {
       "type": "string",
-      "example": "abcd123",
-      "description": "Echoes back the requestId you sent, so you can match this response to your original request."
+      "example": "abc123"
     },
     "apiVersion": {
       "type": "string",
@@ -54,8 +51,7 @@
         "V1.0",
         "V1.1"
       ],
-      "example": "V1.1",
-      "description": "The API version of the IoT Connector responding to this command."
+      "example": "V1.1"
     },
     "deviceStatus": {
       "$ref": "../../refrence/response/deviceStatusResponse.yaml"

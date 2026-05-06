@@ -1,10 +1,9 @@
 {
   "title": "reboot",
-  "x-tag": "System Operations",
   "x-stoplight": {
     "id": "7nvqt0o1pfqja"
   },
-  "description": "Reboot command is used to perform warm reset of device. After successful reboot, device will reinitiate the connection to previously connected SOTI server. Upon failure notification will be sent",
+  "description": "Reboot command is used to perform warm reset of device. After successful reboot, device will reinitiate the connection to previously connected server. Upon failure notification will be sent.",
   "type": "object",
   "properties": {
     "command": {

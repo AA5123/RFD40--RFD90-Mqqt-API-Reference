@@ -1,6 +1,5 @@
 {
   "title": "get_current_region",
-  "x-tag": "Device Status",
   "x-stoplight": {
     "id": "v4uqym3mk9bt0"
   },
@@ -9,15 +8,13 @@
   "properties": {
     "command": {
       "type": "string",
-      "enum": ["get_current_region"],
       "example": "get_current_region",
-      "description": "Must be `get_current_region`. Tells the scanner to return its regulatory radio configuration."
+      "description": "Specifies the operation being performed, in this case, retrieving the current region configuration."
     },
     "requestId": {
       "type": "string",
       "example": "abc123",
-      "description": "A unique ID you assign to this request. The scanner echoes it back in the response so you can match requests to responses."
+      "description": "A unique identifier for the request, allowing tracking and debugging of the operation."
     }
-  },
-  "required": ["command", "requestId"]
+  }
 }

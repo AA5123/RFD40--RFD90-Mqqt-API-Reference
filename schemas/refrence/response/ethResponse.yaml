@@ -30,9 +30,9 @@ items:
             status:
               type: string
               enum:
-                - up
-                - down
-              example: up
+                - Connected
+                - Disconnected
+              example: Connected
             linkSpeed:
               type: string
               example: 100Mbps

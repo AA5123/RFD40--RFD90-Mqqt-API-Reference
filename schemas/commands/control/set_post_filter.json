@@ -1,6 +1,5 @@
 {
   "title": "set_post_filter",
-  "x-tag": "Tag Filtering",
   "x-stoplight": {
     "id": "ba1ssdmsqq3dq"
   },
@@ -32,10 +31,7 @@
         "dataEpType": "DATA_EP1",
         "matchPattern": "FFFFBBBBA500",
         "matchPatternMethod": "PREFIX",
-        "reportOperation": "INCLUDE",
-        "reportDuration": 0,
-        "seenCount": 0,
-        "rssiThreshold": -88
+        "reportOperation": "INCLUDE"
       }
     },
     {
@@ -46,10 +42,7 @@
         "dataEpType": "DATA_EP1",
         "matchPattern": "E280",
         "matchPatternMethod": "REGEX",
-        "reportOperation": "EXCLUDE",
-        "reportDuration": 0,
-        "seenCount": 0,
-        "rssiThreshold": -88
+        "reportOperation": "EXCLUDE"
       }
     }
   ]

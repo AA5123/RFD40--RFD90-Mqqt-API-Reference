@@ -1,0 +1,74 @@
+name: Generate and Deploy HTML Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js for redocly-cli
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'  
+
+      # Step 3: Install redocly-cli
+      - name: Install redocly-cli
+        run: npm install -g @redocly/cli
+
+      # Step 4: Set up Python
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Step 5: Install Python dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jinja2 PyYAML
+          
+      # Step 6: Run the Python script to generate openapi.yaml
+      - name: Execute Python script
+        run: |
+          python ./documentation/scripts/generate_openapi.py
+
+      # Step 6: Set up Node.js (add this before your documentation step)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.0'
+
+      # Step 7: Generate HTML documentation using OpenAPI Generator
+      - name: Generate HTML documentation
+        run: |
+          npx @redocly/cli build-docs openapi.json --output index.html
+
+      # Step 8: Add custom CSS using the Python script
+      - name: Add Custom CSS to HTML
+        run: |
+          python ./documentation/scripts/add_custom_css.py index.html
+
+      # Step 9: Commit and push documentation files to the repository
+      - name: Commit and Push generated documentation files
+        run: |
+          git config --global user.name "DS3362"
+          git config --global user.email "ds3362@zebra.com"
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add documentation files generated via workflow"
+            git push origin main
+          fi
+
+
+

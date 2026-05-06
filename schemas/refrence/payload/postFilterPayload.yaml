@@ -29,13 +29,13 @@ properties:
     type: string
     enum:
       - PREFIX
-      - SUFIX
+      - SUFFIX
       - REGEX
     example: REGEX
     description: >
       Specifies the method used to match the tag ID. 
       `PREFIX`: Matches the beginning of the tag ID.
-      `SUFIX`: Matches the end of the tag ID.
+      `SUFFIX`: Matches the end of the tag ID.
       `REGEX`: Matches the tag ID using a regular expression.
   reportOperation:
     type: string
@@ -50,13 +50,14 @@ properties:
     type: integer
     description: >
       Specifies the duration (in seconds) to wait before reporting a tag again after it has already been reported. 
+      This feature is currently not supported.
       The filter ensures that as long as the tag is being read by the reader, it will not be reported again until the specified duration has elapsed.
     minimum: 0
   seenCount:
     type: integer
     description: >
       Specifies the number of times a tag must be detected before its data is sent out. 
-      This helps in filtering out tags that are inconsistently read.
+      This helps in filtering out tags that are inconsistently read. This feature is currently not supported.
     minimum: 0
   tagList:
     type: object
@@ -71,11 +72,13 @@ properties:
           Specifies whether the tag should be blacklisted or whitelisted. 
           `BLACKLIST`: Excludes tags matching the patterns from reporting.
           `WHITELIST`: Includes only tags matching the patterns for reporting.
+          This feature is currently not supported.
       tagPatterns:
         type: array
         description: >
           An array of tag patterns to be used for whitelisting or blacklisting. 
           Multiple patterns can be provided to define the filter criteria.
+          This feature is currently not supported.
         items:
           type: string
           maxLength: 100
@@ -86,5 +89,6 @@ properties:
       Specifies the RSSI threshold (in dBm). 
       Tags with an RSSI below this threshold will be ignored by the reader. 
       The value must be between -88 dBm (minimum sensitivity) and -26 dBm (maximum sensitivity).
+      This feature is currently not supported.
     minimum: -88
     maximum: -26

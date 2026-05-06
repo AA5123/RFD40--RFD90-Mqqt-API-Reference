@@ -1,0 +1,44 @@
+---
+id: gen-2-x-api-reference
+title: "Gen2X API Reference"
+description: "MQTT-based API for managing and controlling Zebra RFD40 and RFD90 RFID readers. Send JSON command payloads to the MQTT command topic and receive responses on the response topic."
+sidebar_label: Introduction
+sidebar_position: 0
+hide_title: true
+custom_edit_url: null
+---
+
+import ApiLogo from "@theme/ApiLogo";
+import Heading from "@theme/Heading";
+import SchemaTabs from "@theme/SchemaTabs";
+import TabItem from "@theme/TabItem";
+import Export from "@theme/ApiExplorer/Export";
+
+<span
+  className={"theme-doc-version-badge badge badge--secondary"}
+  children={"Version: 1.0.0"}
+>
+</span>
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Gen2X API Reference"}
+>
+</Heading>
+
+
+
+MQTT-based API for managing and controlling Zebra RFD40 and RFD90 RFID readers. Send JSON command payloads to the MQTT command topic and receive responses on the response topic.
+
+## Get started
+
+Use this sequence when working with the API reference and validating commands against the current project artifacts.
+
+## Message model
+
+Commands are sent as JSON payloads to the configured MQTT command topic. Responses and events are received on the corresponding MQTT response and event topics.
+
+Each command follows the reader command envelope defined by its schema. Request and response examples in this reference are generated directly from the current schema files in this project.
+
+

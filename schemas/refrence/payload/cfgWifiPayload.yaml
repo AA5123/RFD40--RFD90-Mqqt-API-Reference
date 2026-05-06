@@ -189,7 +189,7 @@ properties:
                         value:
                           type: string
                           example: wifi_ca_cert
-                          description: The value of the specific certificate.
+                          description: The name of the specific certificate.
                   protocol:
                     type: string
                     enum:
@@ -251,7 +251,7 @@ properties:
                           description: The type of certificate to be used.
                         value:
                           type: string
-                          description: The value of the specific certificate.
+                          description: The name of the specific certificate.
                   protocol:
                     type: string
                     enum:

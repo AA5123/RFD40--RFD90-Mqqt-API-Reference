@@ -1,0 +1,63 @@
+---
+id: mqttconnevt
+title: "Mqttconnevt"
+description: "This event provides details about the connection state of a device, including its metadata and protocol versions."
+sidebar_label: "Mqttconnevt"
+hide_title: true
+hide_table_of_contents: true
+api: eJzFVk1v2zgQ/SsD9uCLqthOsovoVuSjzQJOsrFbLOrmQJMji61EyiSl1DD83xdDyYqcuG1QLLA6SaQ48+bNzBtumOdLx5I5m/w9m8G50RqFV7Xya/YQMYlOWFV6ZTRL2CxTDrBG7aG0plYSHUj0XOUO+MJUHnyGIFobRoPz3COYFDhIrJXACJQWeSWVXoLyDgr0XHLPgWtJNr0RJocarVNGu5hFzKIrjXboWLJhElNe5b557SMrVt4T9stPsx1Avs4NlyxiwmiPOhziZZkrwenQ0VdHJzfMiQwLTm9+XSJLmFl8ReFZxEprSrReNb6fwppSVL0Dzlullyxi+J0XZU5L57c3N5fns8sLWtVVQQT31y6up0+fL3i+1pJQojvEZ+WIUNpoKI3hzjinFjlCzfMKHXCLMOjMD8BYGPQdDmK2jZhXBTrPi/LnkYzGyejP5PQPFrHU2IJ7loSj7GVxINAGcA+PmRJZwBiqqhdBkxwjRGUtyggamx4lcAcfPiSTSTKdBnxNdBMjMf85wvuri5Nhj+fd9/3VxdnwJbnTEoVKVUtuQfb3CQWla5PXKEHpH8cQw7QqS2MJejDS8h68D0I9DwKCQS+aKVrF8xvzioDejk9GZ8PT8eloODw+PTlId6XVqkJwwSroqlig/a1YCCEv1aem73roGpv7BREPD4Jpm3bn/93dNfmsHIKsKMRfuKcOfpX/43gUj16DIPjqNGWBhKFyKKnmnjVWzLbbbecktHv7PqL30FcHNWCvqXsd1W+bvULuqvN5Qfwo6/20tNzvUdXy0YM//gXkPe35L+GN4vEzcMfx8Cw82+aJWIE+M5IlrDQuaCz3GUvYUU/AWcSUTpseUT7k/D3q8T+hpO4xRYtakP7UfV4OVCUVwNsFp5TTUUp7wTVfUiFQf9JgsCbP6fszLiyHEGTYC60L91fXF2CRS7QuhilqCX9Nb29AmKIIE6sZMg686Zd3s+lNqUQwZlGgqhG6WQam6cbdQvNv/EV/0W/ewHv0pPQkLbTykfZp8jpcVRQ6PGao4dHYb4T8Ufms6zi7oyf4rXmuJPf0VwvKAV9ypV07qUmEm2FOIw+49Srlwrsdkgk6x5etStLaeWfGku5oT7IdKHlOhTA6VcvKojzASgz3HRW0GGSgMdpyJXcUCWMblsKdIZjqWOuONlYb2JdcZJ231OS5eXQt2ZTHbgt1jbkpSSlTpVHCYh2uJM19gBCuKnS+TWDrcacQjZwq1yfcIixRo+U0EqSyKHy+htSaYo/sxj6kqm+mzUBQQuqMggcV1Lyg8p+svA99XPvnRb55ut78L9ezVqc9fvdHZc6VpggqG0Z209vz/uWMxnFGnZ/M2WZDvfnR5tstLa8qtGuWzB8iVnOr+II6f/6wjVgWEseS+YZ9wzVL2DshsCQqWpV7ea/bPvSk5u52OmPb7b8fYLhl
+sidebar_class_name: "post api-method"
+info_path: docs/api/gen-2-x-api-reference
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Mqttconnevt"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/mqttConnEVT"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+This event provides details about the connection state of a device, including its metadata and protocol versions.
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"default":{"description":"mqttConnEVT event payload","content":{"application/json":{"schema":{"type":"object","properties":{"connectionState":{"type":"string","example":"CONNECTED","enum":["CONNECTED","DISCONNECTED"],"description":"Indicates the connection status of the device. Possible values are 'CONNECTED' or 'DISCONNECTED'."},"timestamp":{"type":"string","example":"12:17:56","format":"time","description":"The time at which the MQTT connection event occurred, formatted as HH:MM:SS."},"deviceModel":{"type":"string","example":"RFD40","enum":["RFD40","RFD90"],"description":"Specifies the model of the device involved in the MQTT connection event. Supported models are 'RFD40' and 'RFD90'."},"deviceSerialNo":{"type":"string","example":"RFD40-24190525100354","description":"The unique serial number of the device involved in the MQTT connection event."},"apiVersion":{"type":"number","example":"1.0","description":"The version of the API in use during the MQTT connection event."},"mqttVersion":{"type":"number","example":"3.1.1","description":"The version of the MQTT protocol being used for the connection."}}},"examples":{"example1":{"value":{"connectionState":"CONNECTED","timestamp":"12:17:56","deviceModel":"RFD40","deviceSerialNo":"RFD40-24190525100354","apiVersion":"1.0","mqttVersion":"3.1.1"}},"example2":{"value":{"connectionState":"DISCONNECTED","deviceModel":"RFD40","deviceSerialNo":"RFD40-24190525100354","apiVersion":1.2,"mqttVersion":3.0999999}}}}}}}}
+>
+  
+</StatusCodes>
+
+

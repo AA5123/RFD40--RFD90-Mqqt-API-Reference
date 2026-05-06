@@ -63,14 +63,15 @@
         "Complete config setup": "Payload to set complete configuration with WiFi and management endpoint"
     },
     "delete_certificate": {
-        "Delete client cert": "Payload to delete a client certificate from the device",
-        "Delete filestore cert": "Payload to delete a filestore certificate from the device"
+        "Delete wifi ca cert": "Payload to delete a WiFi CA certificate from the device",
+        "Delete mqtt client cert": "Payload to delete an MQTT client certificate from the device",
+        "Delete filestore ca cert": "Payload to delete a filestore CA certificate from the device"
     },
     "install_certificate": {
-        "WiFi certificate install": "Payload to install WiFi certificates with CA, client cert and key",
-        "Filestore certificate": "Payload to install filestore CA certificate",
-        "MQTT client certificate": "Payload to install MQTT client certificates",
-        "Server certificate": "Payload to install server certificates with authentication"
+        "Filestore certificate using URL": "Payload to install filestore CA certificate",
+        "MQTT certificates using URL": "Payload to install MQTT client certificates",
+        "WiFi certificates using URL": "Payload to install WiFi certificates with CA, client cert and key",
+        "WiFi CA certificate using direct content": "Installing WiFi CA certificate, where certificate content is provided as part of API"
     },
     "get_wifi": {
         "WPA2 Personal connection": "Response with WiFi connected to WPA2 Personal network",
@@ -95,13 +96,25 @@
         "Installed certificates list": "Response with list of all installed certificates"
     },
     "get_eth": {
-        "Ethernet config info": "Response with ethernet interface configuration details"
+        "Ethernet config info": "Response with ethernet interface configuration details",
+        "Ethernet interface disabled": "Response when ethernet interface is disabled on the device"
+    },
+    "alerts": {
+        "Battery alert": "Alert indicating battery status such as low or critical battery level",
+        "Power alert": "Alert indicating power events.",
+        "Network alert for ethernet": "Alert indicating network events when ethernet connected",
+        "Network alert for WiFi": "Alert indicating network events when WiFi connected",
+        "Firmware update alert": "Alert related to firmware update events such as status and progress"
     },
     "alert_short": {
         "Firmware download success": "Alert indicating successful firmware download",
         "Battery critical set": "Alert indicating battery level is critically low",
         "WiFi config fail": "Notification indicating WiFi configuration failure",
-        "MQTT install certificate success": "Notification indicating successful MQTT certificate installation"
+        "MQTT CA certificate download success": "Notification indicating successful MQTT CA certificate download",
+        "MQTT CA certificate install success": "Notification indicating successful MQTT CA certificate installation",
+        "WiFi client certificate download success": "Notification indicating successful WiFi client certificate download",
+        "WiFi client certificate install success": "Notification indicating successful WiFi client certificate installation",
+        "Filestore client key download fail": "Notification indicating failure in filestore client key download"
 
     }
 }

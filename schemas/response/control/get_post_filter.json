@@ -41,10 +41,7 @@
             "dataEpType": "DATA_EP1",
             "matchPattern": "FFFF",
             "matchPatternMethod": "REGEX",
-            "reportOperation": "INCLUDE",
-            "reportDuration": 0,
-            "seenCount": 0,
-            "rssiThreshold": -88
+            "reportOperation": "INCLUDE"
           }
         ]
       },
